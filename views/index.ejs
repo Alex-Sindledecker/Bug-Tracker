@@ -4,9 +4,13 @@
     <head>
         <meta charset="utf-8"/>
         <title></title>
-        <link rel="css/stylesheet" href="css/main.css"/>
+        <link rel="stylesheet" href="/css/main.css" type="text/css"/>
     </head>
     <body>
-        
+        <% if (locals.username) { %>
+            <%- include("partials/user-home.ejs") %>
+        <% } else { %>
+            <%- include("partials/home.ejs") %>
+        <% } %>
     </body>
 </html>
