@@ -3,10 +3,10 @@ Color pallete:
 */
 
 :root{
-    --red1: #79155B;
-    --red2: #C23373;
-    --orange: #F6635C;
-    --tan: #FFBA86;
+    --color1: #79155B;
+    --color2: #C23373;
+    --color3: #F6635C;
+    --color4: #FFBA86;
 }
 
 *{
@@ -31,6 +31,18 @@ a{
     color: white;
 }
 
+#daylight-button{
+    background: none;
+    border: none;
+    color: white;
+    scale:1.3;
+    transition: transform 0.5s;
+}
+
+#daylight-button:hover{
+    transform: rotate(360deg);
+}
+
 .header{
     
 }
@@ -46,7 +58,7 @@ a{
     display: flex;
     justify-content: space-between;
 
-    background-color: var(--red1);
+    background-color: var(--color1);
     color: white;
 
     font-size: 0.9em;
