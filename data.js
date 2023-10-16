@@ -76,7 +76,7 @@ export class InstanceDatabase extends Database{
     }
 
     getProject(id){
-        if (this.projects[id] !== null)
+        if (id < this.projects.length && this.projects[id] !== null)
             return this.projects[id];
         throw new Error(`Could not find database with id '${id}'!`);
     }

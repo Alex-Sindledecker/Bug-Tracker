@@ -14,7 +14,8 @@ $("#daylight-button").click(() => {
             "--color1": "#79155B",
             "--color2": "#C23373",
             "--color3": "#F6635C",
-            "--color4": "#FFBA86"
+            "--color4": "#FFBA86",
+            "--font-color": "white"
         });
 
         $("body").css("background-color", "#262426");
@@ -26,7 +27,8 @@ $("#daylight-button").click(() => {
             "--color1": "#79155B",
             "--color2": "#ff0000",
             "--color3": "#0000ff",
-            "--color4": "#ff0f0f"
+            "--color4": "#ff0f0f",
+            "--font-color": "#323232"
         });
         
         $("body").css("background-color", "#c4c4c4");

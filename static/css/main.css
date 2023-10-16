@@ -7,6 +7,7 @@ Color pallete:
     --color2: #C23373;
     --color3: #F6635C;
     --color4: #FFBA86;
+    --font-color: white;
 }
 
 *{
@@ -28,7 +29,7 @@ body{
 
 a{
     text-decoration: underline;
-    color: white;
+    color: var(--font-color);
 }
 
 #daylight-button{
@@ -43,12 +44,33 @@ a{
     transform: rotate(360deg);
 }
 
+.huge-text{
+    font-size: 4em;
+}
+
+.big-text{
+    font-size: 3rem;
+}
+
 .header{
     
 }
 
 .main-content{
     flex: 1 1 auto;
+    color: var(--font-color);
+}
+
+.flex-center-all{
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+
+.medium-gap{
+    gap: 2em;
 }
 
 .footer{
@@ -62,4 +84,8 @@ a{
     color: white;
 
     font-size: 0.9em;
+}
+
+.footer a{
+    color: white;
 }

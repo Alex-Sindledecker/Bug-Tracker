@@ -25,9 +25,16 @@ app.get("/", (req, res) => {
         res.render(__dirname + "/views/index.ejs");
     else
         res.render(__dirname + "/views/index.ejs", {username: "Dev123"});
+});
 
-    console.log(database.getBugs(projectId));
-    
+app.get("/project/:id", (req, res) => {
+    try{
+        const project = database.getProject(req.params.id);
+        res.sendStatus(200);
+    } catch (error){
+        console.log(error.message);
+        res.status(404).render(__dirname + "/views/not-found-404.ejs");
+    }
 });
 
 app.listen(port, () => {
