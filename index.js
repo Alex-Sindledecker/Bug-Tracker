@@ -1,6 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
-import {BugManager, InstanceDatabase} from "./data.js";
+import {InstanceDatabase} from "./data.js";
 
 import {dirname} from "path";
 import { fileURLToPath } from "url";
@@ -10,7 +10,12 @@ const bypassLogin = true;
 const port = 3000;
 const app = express();
 
-let bugManager = new BugManager(new InstanceDatabase());
+let database = new InstanceDatabase();
+const projectId = database.addProject("My Project", "Dev project").id;
+database.addBug(projectId, 4, "Level 4 bug", "Fix this thing in this place");
+database.addBug(projectId, 3, "Level 3 bug", "Fix this thing in this other place");
+database.addBug(projectId, 2, "Level 2 bug", "Fix this thing in a hypothetical place");
+database.addBug(projectId, 1, "Level 1 bug", "Fix this thing in a different place");
 
 app.use(express.static("static"));
 app.use(bodyParser.urlencoded({extended: true}));
@@ -21,9 +26,8 @@ app.get("/", (req, res) => {
     else
         res.render(__dirname + "/views/index.ejs", {username: "Dev123"});
 
-    bugManager.setTargetProject(1);
-    const bugModel = bugManager.makeBug(4, "Death bug", "Evil bug that kills thigns");
-    console.log(bugModel);
+    console.log(database.getBugs(projectId));
+    
 });
 
 app.listen(port, () => {
