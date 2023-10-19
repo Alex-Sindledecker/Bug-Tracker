@@ -15,11 +15,13 @@ $("#daylight-button").click(() => {
             "--color2": "#C23373",
             "--color3": "#F6635C",
             "--color4": "#FFBA86",
-            "--font-color": "white"
+            "--font-color": "white",
+            "--card-background": "#363436"
         });
 
         $("body").css("background-color", "#262426");
         $("#daylight-button").html(nightSVG);
+        $(".check-button").css("color", "white");
 
         darkMode = true;
     }else{
@@ -28,11 +30,13 @@ $("#daylight-button").click(() => {
             "--color2": "#ff0000",
             "--color3": "#0000ff",
             "--color4": "#ff0f0f",
-            "--font-color": "#323232"
+            "--font-color": "#323232",
+            "--card-background": "#d4d4d4"
         });
         
         $("body").css("background-color", "#c4c4c4");
         $("#daylight-button").html(daySVG);
+        $(".check-button").css("color", "black");
 
         darkMode = false;
     }
