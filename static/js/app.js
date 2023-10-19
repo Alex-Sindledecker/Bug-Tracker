@@ -21,7 +21,7 @@ $("#daylight-button").click(() => {
 
         $("body").css("background-color", "#262426");
         $("#daylight-button").html(nightSVG);
-        $(".check-button").css("color", "white");
+        $(".card-button").css("color", "white");
 
         darkMode = true;
     }else{
@@ -36,7 +36,7 @@ $("#daylight-button").click(() => {
         
         $("body").css("background-color", "#c4c4c4");
         $("#daylight-button").html(daySVG);
-        $(".check-button").css("color", "black");
+        $(".card-button").css("color", "black");
 
         darkMode = false;
     }

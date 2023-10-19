@@ -169,6 +169,14 @@ a{
     width: 20px;
 }
 
+.bug-level-archive{
+    display: block;
+    background-color: rgb(127, 127, 127);
+    box-shadow: 5px 5px 5px rgb(100, 100, 100);
+    border-radius: 10px;
+    width: 20px;
+}
+
 .card-button{
     background: none;
     border: none;

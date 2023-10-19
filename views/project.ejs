@@ -14,14 +14,19 @@
                 <div class="project-banner">
                     <h2><%= project.name %></h2>
                     <div>
-                        <button class="project-banner-button">Add People</button>&emsp;
-                        <a class="project-banner-button" href="/project/<%=project.id%>/archive/">Archive</a>
+                        <a class="project-banner-button" href="/project/<%=project.id%>/">Project Home</a>&emsp;
+                        <a class="project-banner-button" href="/project/<%=project.id%>/archive/">Archive</a>&emsp;
+                        <button class="project-banner-button">Add People</button>
                     </div>
                 </div>
                 <div class="bug-grid">
                     <% bugs.forEach(bug => { %>
                         <div class="bug-card">
-                            <div class="bug-level-<%=bug.level%>"></div>
+                            <% if (bug.archived === false) { %>
+                                <div class="bug-level-<%=bug.level%>"></div>
+                            <% } else { %>
+                                <div class="bug-level-archive"></div>
+                            <% } %>
                             <div class="card-content">
                                 <h3 class="bug-card-title">
                                     <%= bug.name %>
