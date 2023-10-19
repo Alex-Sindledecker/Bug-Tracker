@@ -45,7 +45,7 @@ $("#daylight-button").click(() => {
 $(".check-button").click(function(){
     //Verify that the check button is a withing a bug card
     if ($(this).parents(".bug-card").length > 0){
-        $.post("/archive", {
+        $.post(window.location.href.replace(/\/$/, "") + "/archive", {
             projectId: window.location.href.substring(window.location.href.lastIndexOf('/') + 1),
             id: $(this).attr("name")
         }, (data, status) => {

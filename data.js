@@ -16,7 +16,7 @@ class Database{
         throw new Error("Method 'getBug()' must be implemented!");
     }
 
-    getBugs(projectId){
+    getBugs(projectId, filter){
         throw new Error("Method 'getBugs()' must be implemented!");
     }
 
@@ -28,12 +28,12 @@ class Database{
         throw new Error("Method 'getProjects()' must be implemented!");
     }
 
-    archiveBug(id){
-        throw new Error("method 'archiveBug()' must be implemented!");
+    updateBug(id, newModel){
+        throw newError("Method 'updateBug()' must be implemented!");
     }
 
-    unarchiveBug(id){
-        throw new Error("Method 'unarchiveBug()' must be implemented!");
+    modifyBug(id, key, value){
+        throw newError("Method 'modifyBug()' must be implemented!");
     }
 
     deleteBug(id){
@@ -91,34 +91,42 @@ export class InstanceDatabase extends Database{
     }
 
     getBug(id){
-        if (this.bugs[id] === null)
-            throw new Error(`Could not find the bug with id '${id}`);
+        this.__validateBug(id);
         return this.bugs[id];
     }
 
-    getBugs(projectId){
-        return this.bugs.filter(bug => bug.projectId === projectId && bug.archived === false);
+    getBugs(projectId, filter){
+        return this.bugs.filter(filter);
     }
 
-    archiveBug(id){
-        if (this.bugs[id] === null)
-            throw new Error(`Could not find the bug with id ${id}`);
+    updateBug(id, newModel){
+        this.__validateBug(id);
 
-        this.bugs[id].archived = true;
+        if (Object.keys(newModel).sort().toString() !== Object.keys(this.bugs[id]).sort().toString())
+            throw new Error("Invalid Model!");
+
+        this.bugs[id] = newModel;
+        
     }
 
-    unarchiveBug(id){
-        if (this.bugs[id] === null)
-            throw new Error(`Could not find the bug with id ${id}`);
+    modifyBug(id, key, value){
+        this.__validateBug(id);
 
-        this.bugs[id].archived = false;
+        if (key in this.bugs[id] === false)
+            throw new Error(`Key '${key}' not found in bug model!`);
+
+        this.bugs[id][key] = value;
     }
 
     deleteBug(id){
-        if (this.bugs[id] === null)
-            throw new Error(`Could not find the bug with id ${id}`);
+        this.__validateBug(id);
 
         this.bugs.splice(id, 1);
+    }
+
+    __validateBug(id){
+        if (this.bugs[id] === null)
+            throw new Error(`Could not find the bug with id '${id}`);
     }
 }
 
@@ -132,4 +140,50 @@ export class MongoDatabase extends Database{
     constructor(){ super(); }
 
     addBug(){}
+}
+
+export class DataManager{
+    constructor(database){
+        this.database = database;
+    }
+
+    createProject(name, description){
+        return this.database.addProject(name, description);
+    }
+
+    createBug(projectId, name, description, level){
+        return this.database.addBug(projectId, level, name, description);
+    }
+
+    getProject(id){
+        return this.database.getProject(id);
+    }
+
+    getBug(id){
+        return this.database.getBug(id);
+    }
+
+    getBugs(projectId){
+        return this.database.getBugs(projectId, bug => bug.projectId === projectId && bug.archived === false);
+    }
+
+    getArchivedBugs(projectId){
+        return this.database.getBugs(projectId, bug => bug.projectId === projectId && bug.archived === true);
+    }
+
+    archiveBug(id){
+        this.database.modifyBug(id, "archived", true);
+    }
+
+    unarchiveBug(id){
+        this.database.modifyBug(id, "archived", false);
+    }
+
+    deleteBug(id){
+
+    }
+
+    deleteProject(id){
+
+    }
 }

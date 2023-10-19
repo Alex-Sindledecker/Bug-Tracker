@@ -1,6 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
-import {InstanceDatabase} from "./data.js";
+import {InstanceDatabase, DataManager} from "./data.js";
 
 import {dirname} from "path";
 import { fileURLToPath } from "url";
@@ -17,6 +17,8 @@ database.addBug(projectId, 3, "Level 3 bug", "Fix this thing in this other place
 database.addBug(projectId, 2, "Level 2 bug", "Fix this thing in a hypothetical place");
 database.addBug(projectId, 1, "Level 1 bug", "Fix this thing in a different place");
 
+let dataManager = new DataManager(database);
+
 app.use(express.static("static"));
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -29,8 +31,8 @@ app.get("/", (req, res) => {
 
 app.get("/project/:id", (req, res) => {
     try{
-        const project = database.getProject(req.params.id);
-        const bugs = database.getBugs(project.id);
+        const project = dataManager.getProject(req.params.id);
+        const bugs = dataManager.getBugs(project.id);
 
         res.render(__dirname + "/views/project.ejs", {project: project, bugs: bugs});
     } catch (error){
@@ -39,16 +41,12 @@ app.get("/project/:id", (req, res) => {
     }
 });
 
-app.post("/archive", (req, res) => {
-    const projectId = req.body.projectId;
+app.post("/project/:id/archive", (req, res) => {
+    const projectId = req.params.id;
     const bugId = req.body.id;
 
-    console.log(database.getBugs(Number.parseInt(projectId)));
-
     try{
-        database.archiveBug(bugId);
-
-        console.log(database.getBugs(Number.parseInt(projectId)));
+        dataManager.archiveBug(bugId);
 
         res.sendStatus(200);
     }
@@ -56,6 +54,12 @@ app.post("/archive", (req, res) => {
         console.log(error.message);
         res.sendStatus(404);
     }
+});
+
+app.get("/project/:id/archive", (req, res) => {
+    const projectId = req.params.id;
+
+
 });
 
 app.listen(port, () => {
