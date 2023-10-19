@@ -39,6 +39,25 @@ app.get("/project/:id", (req, res) => {
     }
 });
 
+app.post("/archive", (req, res) => {
+    const projectId = req.body.projectId;
+    const bugId = req.body.id;
+
+    console.log(database.getBugs(Number.parseInt(projectId)));
+
+    try{
+        database.archiveBug(bugId);
+
+        console.log(database.getBugs(Number.parseInt(projectId)));
+
+        res.sendStatus(200);
+    }
+    catch (error){
+        console.log(error.message);
+        res.sendStatus(404);
+    }
+});
+
 app.listen(port, () => {
     console.log("App running on port " + port);
 });

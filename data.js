@@ -28,6 +28,14 @@ class Database{
         throw new Error("Method 'getProjects()' must be implemented!");
     }
 
+    archiveBug(id){
+        throw new Error("method 'archiveBug()' must be implemented!");
+    }
+
+    unarchiveBug(id){
+        throw new Error("Method 'unarchiveBug()' must be implemented!");
+    }
+
     deleteBug(id){
         throw new Error("Method 'deleteBug()' must be implemented!");
     }
@@ -66,7 +74,8 @@ export class InstanceDatabase extends Database{
             projectId: projectId,
             level: level,
             name: name,
-            description: description
+            description: description,
+            archived: false
         };
         this.nextBugId += 1;
 
@@ -88,7 +97,28 @@ export class InstanceDatabase extends Database{
     }
 
     getBugs(projectId){
-        return this.bugs.filter(bug => bug.projectId === projectId);
+        return this.bugs.filter(bug => bug.projectId === projectId && bug.archived === false);
+    }
+
+    archiveBug(id){
+        if (this.bugs[id] === null)
+            throw new Error(`Could not find the bug with id ${id}`);
+
+        this.bugs[id].archived = true;
+    }
+
+    unarchiveBug(id){
+        if (this.bugs[id] === null)
+            throw new Error(`Could not find the bug with id ${id}`);
+
+        this.bugs[id].archived = false;
+    }
+
+    deleteBug(id){
+        if (this.bugs[id] === null)
+            throw new Error(`Could not find the bug with id ${id}`);
+
+        this.bugs.splice(id, 1);
     }
 }
 

@@ -41,3 +41,17 @@ $("#daylight-button").click(() => {
         darkMode = false;
     }
 });
+
+$(".check-button").click(function(){
+    //Verify that the check button is a withing a bug card
+    if ($(this).parents(".bug-card").length > 0){
+        $.post("/archive", {
+            projectId: window.location.href.substring(window.location.href.lastIndexOf('/') + 1),
+            id: $(this).attr("name")
+        }, (data, status) => {
+            alert("Data: " + data + "\nStatus: " + status);
+        });
+
+        $(this).parents(".bug-card")[0].remove();
+    }
+});

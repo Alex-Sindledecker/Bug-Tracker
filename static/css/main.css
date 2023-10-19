@@ -168,6 +168,7 @@ a{
 
 .check-button:hover{
     transform: rotate(360deg);
+    color: green;
 }
 
 @media (max-width: 680px) {
