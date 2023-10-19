@@ -42,16 +42,22 @@ $("#daylight-button").click(() => {
     }
 });
 
-$(".check-button").click(function(){
-    //Verify that the check button is a withing a bug card
-    if ($(this).parents(".bug-card").length > 0){
-        $.post(window.location.href.replace(/\/$/, "") + "/archive", {
-            projectId: window.location.href.substring(window.location.href.lastIndexOf('/') + 1),
-            id: $(this).attr("name")
-        }, (data, status) => {
-            alert("Data: " + data + "\nStatus: " + status);
-        });
+$(".card-button").click(function(){
+    const action = $(this).attr("name").split('-')[0];
 
-        $(this).parents(".bug-card")[0].remove();
-    }
+    let data = {
+        projectId: window.location.href.substring(window.location.href.lastIndexOf('/') + 1),
+        id: $(this).attr("name").split('-')[1]
+    };
+
+    let callback = (data, status) => {
+        if (status === 'success'){
+            $(this).parents(".bug-card")[0].remove();
+        }
+    };
+
+    let projectId = window.location.href.match(/\/project\/(\d+)/)[1];
+    console.log(projectId);
+
+    $.post(`/project/${projectId}/${action}`, data, callback);
 });

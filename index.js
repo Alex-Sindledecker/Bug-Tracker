@@ -57,9 +57,43 @@ app.post("/project/:id/archive", (req, res) => {
 });
 
 app.get("/project/:id/archive", (req, res) => {
+    try{
+        const project = dataManager.getProject(req.params.id);
+        const bugs = dataManager.getArchivedBugs(project.id);
+
+        res.render(__dirname + "/views/project.ejs", {project: project, bugs: bugs});
+    } catch (error){
+        console.log(error.message);
+        res.status(404).render(__dirname + "/views/not-found-404.ejs");
+    }
+});
+
+app.post("/project/:id/restore", (req, res) => {
     const projectId = req.params.id;
+    const bugId = req.body.id;
 
+    try{
+        dataManager.unarchiveBug(bugId);
 
+        res.sendStatus(200);
+    }
+    catch (error){
+        console.log(error.message);
+        res.sendStatus(404);
+    }
+});
+
+app.post("/project/:id/delete", (req, res) => {
+    const bugId = req.body.id;
+
+    try{
+        dataManager.deleteBug(bugId);
+
+        res.sendStatus(200);
+    } catch (error){
+        console.log(error.message);
+        res.sendStatus(404);
+    }
 });
 
 app.listen(port, () => {

@@ -180,7 +180,7 @@ export class DataManager{
     }
 
     deleteBug(id){
-
+        this.database.deleteBug(id);
     }
 
     deleteProject(id){

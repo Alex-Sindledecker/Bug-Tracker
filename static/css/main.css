@@ -80,6 +80,18 @@ a{
     padding: 2em;
 }
 
+.project-banner-button{
+    background: none;
+    color: var(--font-color);
+    border: none;
+    font-size: 1em;
+    text-decoration: underline;
+}
+
+.project-banner-button:hover{
+    cursor:pointer;
+}
+
 .bug-grid{
     display: grid;
     grid-auto-flow: row dense;
@@ -157,7 +169,7 @@ a{
     width: 20px;
 }
 
-.check-button{
+.card-button{
     background: none;
     border: none;
     color: white;
@@ -166,9 +178,16 @@ a{
     margin-left: 1em;
 }
 
-.check-button:hover{
+.card-button:hover{
     transform: rotate(360deg);
-    color: green;
+}
+
+.card-button-red:hover{
+    color: red;
+}
+
+.card-button-green:hover{
+    color: greenyellow;
 }
 
 @media (max-width: 680px) {
