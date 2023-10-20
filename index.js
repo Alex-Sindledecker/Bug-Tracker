@@ -34,7 +34,7 @@ app.get("/project/:id", (req, res) => {
         const project = dataManager.getProject(req.params.id);
         const bugs = dataManager.getBugs(project.id);
 
-        res.render(__dirname + "/views/project.ejs", {project: project, bugs: bugs});
+        res.render(__dirname + "/views/project.ejs", {project: project, bugs: bugs, archivePage: false});
     } catch (error){
         console.log(error.message);
         res.status(404).render(__dirname + "/views/not-found-404.ejs");
@@ -61,7 +61,7 @@ app.get("/project/:id/archive", (req, res) => {
         const project = dataManager.getProject(req.params.id);
         const bugs = dataManager.getArchivedBugs(project.id);
 
-        res.render(__dirname + "/views/project.ejs", {project: project, bugs: bugs});
+        res.render(__dirname + "/views/project.ejs", {project: project, bugs: bugs, archivePage: true});
     } catch (error){
         console.log(error.message);
         res.status(404).render(__dirname + "/views/not-found-404.ejs");
