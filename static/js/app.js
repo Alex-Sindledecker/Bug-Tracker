@@ -8,6 +8,8 @@ const nightSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
 
 let darkMode = true;
 
+$("#add-bug-overlay").hide();
+
 $("#daylight-button").click(() => {
     if (darkMode === false){
         $(":root").css({
@@ -27,9 +29,9 @@ $("#daylight-button").click(() => {
     }else{
         $(":root").css({
             "--color1": "#79155B",
-            "--color2": "#ff0000",
-            "--color3": "#0000ff",
-            "--color4": "#ff0f0f",
+            "--color2": "#C23373",
+            "--color3": "#F6635C",
+            "--color4": "#FFBA86",
             "--font-color": "#323232",
             "--card-background": "#d4d4d4"
         });
@@ -60,4 +62,12 @@ $(".card-button").click(function(){
     console.log(projectId);
 
     $.post(`/project/${projectId}/${action}`, data, callback);
+});
+
+$(".add-bug-card").click(() => {
+    $("#add-bug-overlay").show();
+});
+
+$(".close-overlay-button").click(function(){
+    $(this).parents(".site-overlay").hide();
 });
