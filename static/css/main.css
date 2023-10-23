@@ -215,7 +215,7 @@ a{
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    background-color: rgb(127, 127, 127);
+    background-color:var(--card-background);
     padding: 2em;
     border-radius: 10px;
     box-shadow: 7px 7px 10px rgb(80, 80, 80),
@@ -231,16 +231,16 @@ a{
 
 .site-overlay > h3{
     font-size: 1.5em;
-    color: #363436;
+    color: var(--font-color);
 }
 
 .site-overlay > input,textarea{
     font-size: 1em;
     font-family: sans-serif;
     border: none;
-    background-color: rgb(200,200,200);
     padding: 0.8em;
     width: 400px;
+    border-radius: 5px;
 }
 
 .site-overlay > textarea{
@@ -250,15 +250,49 @@ a{
 
 .overlay-button{
     padding: 1em;
-    font-size: 1em;
+    font-size: 1.2em;
     border-radius: 10px;
     border: none;
-    background-color: var(--color3);
-    color: #363436
+    background-color: var(--color1);
+    color: white;
+    width: 100%;
 }
 
 .overlay-button:hover{
     cursor: pointer;
+}
+
+.close-overlay-button{
+    position: absolute;
+    left: 0;
+    top: 0;
+    scale: 2.3;
+    margin: 20px;
+    color:var(--font-color)
+}
+
+.close-overlay-button:hover{
+    cursor: pointer;
+}
+
+.level-selector{
+    display: flex;
+    gap: 1px;
+    width: 100%;
+}
+
+.level-selection{
+    color: #363436;
+    font-size: 1.2em;
+    border: 1px solid white;
+    padding: 1em;
+    flex: 1;
+    text-align: center;
+    background-color: white;
+}
+
+.level-selection:hover{
+    cursor:pointer;
 }
 
 @media (max-width: 680px) {

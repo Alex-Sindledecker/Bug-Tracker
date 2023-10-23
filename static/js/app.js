@@ -71,3 +71,22 @@ $(".add-bug-card").click(() => {
 $(".close-overlay-button").click(function(){
     $(this).parents(".site-overlay").hide();
 });
+
+$(".level-selection").click(function(){
+    $("#level").attr("value", $(this).attr("name"));
+	$(".level-selection").css("background-color", "white");
+    switch ($(this).attr("name")){
+        case "4":
+            $(this).css("background-color", "magenta");
+            break;
+        case "3":
+            $(this).css("background-color", "red");
+            break;
+        case "2":
+            $(this).css("background-color", "goldenrod");
+            break;
+        case "1":
+            $(this).css("background-color", "green");
+            break;
+    }
+});
