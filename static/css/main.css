@@ -295,9 +295,37 @@ a{
     cursor:pointer;
 }
 
-@media (max-width: 680px) {
+@media (max-width: 1025px){
+    .bug-grid{
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 769px) {
+    .project-banner{
+        flex-direction: column;
+        text-align: center;
+        gap: 1em;
+        padding: 1em;
+    }
+
+    .project-banner > div{
+        display: flex;
+        flex-direction: column;
+    }
+
+    .bug-grid{
+        grid-template-columns: 1fr;
+    }
+
     .footer{
+        text-align: center;
         flex-direction: column;
         justify-content: center;
+    }
+
+    #daylight-button{
+        order: 1;
+        margin-top: 1.1em;
     }
 }
