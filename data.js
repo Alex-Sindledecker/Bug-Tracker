@@ -1,7 +1,17 @@
+import mongoose from "mongoose";
+
 class Database{
     constructor(){
         if (this.constructor == Database)
             throw new Error("Cannot instantiate abstract class 'Database'!");
+    }
+
+    async init(url){
+        throw new Error("Method 'init()' must be implemented!");
+    }
+
+    async disconnect(url){
+        throw new Error("Method 'disconnect()' must be implemented!");
     }
 
     addProject(name, description){
@@ -54,6 +64,9 @@ export class InstanceDatabase extends Database{
         this.nextBugId = 0;
         this.nextProjecctId = 0;
     }
+
+    async init(url){}
+    async disconnect(){}
 
     addProject(name, description){
         const model = {
@@ -137,14 +150,63 @@ export class SQLDatabase extends Database{
 }
 
 export class MongoDatabase extends Database{
-    constructor(){ super(); }
+    constructor(){ 
+        super();
+    }
 
-    addBug(){}
+    async init(url){
+        await mongoose.connect(url).then(() => console.log("Succesfully connected to database!"));
+    }
+
+    async disconnect(){
+        await mongoose.disconnect();
+    }
+
+    addProject(name, description){
+        
+    }
+
+    addBug(projectId, level, name, description){
+        
+    }
+
+    getProject(id){
+        
+    }
+
+    getBug(id){
+        
+    }
+
+    getBugs(projectId, filter){
+        
+    }
+
+    updateBug(id, newModel){
+        
+        
+    }
+
+    modifyBug(id, key, value){
+        
+    }
+
+    deleteBug(id){
+        
+    }
 }
 
 export class DataManager{
     constructor(database){
         this.database = database;
+    }
+
+    async initDb(dbUrl){
+        await this.database.init(dbUrl);
+    }
+
+    async closeDb(){
+        await this.database.disconnect();
     }
 
     createProject(name, description){
