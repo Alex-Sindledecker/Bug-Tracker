@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, {Schema} from "mongoose";
 
 class Database{
     constructor(){
@@ -152,47 +152,76 @@ export class SQLDatabase extends Database{
 export class MongoDatabase extends Database{
     constructor(){ 
         super();
+    
+        this._bugSchema = {
+            projectId: Schema.ObjectId,
+            level: Number,
+            name: String,
+            description: String,
+            archived: Boolean
+        }
+
+        this._projectSchema = {
+            name: String,
+            description: String
+        }
     }
 
     async init(url){
-        await mongoose.connect(url).then(() => console.log("Succesfully connected to database!"));
+        await mongoose.connect(url).then(() => console.log("Succesfully connected to the mongo database!\n"));
+
+        this._BugModel = mongoose.model("bug", this._bugSchema);
+        this._ProjectModel = mongoose.model("project", this._projectSchema);
     }
 
     async disconnect(){
         await mongoose.disconnect();
     }
 
-    addProject(name, description){
+    async addProject(name, description){
+        let project = new this._ProjectModel({
+            name: name,
+            description: description
+        });
+
+        await project.save();
+
+        return project.toObject();
+    }
+
+    async addBug(projectId, level, name, description){
         
     }
 
-    addBug(projectId, level, name, description){
+    async getProject(id){
         
     }
 
-    getProject(id){
+    async getBug(id){
         
     }
 
-    getBug(id){
+    async getBugs(projectId, filter){
         
     }
 
-    getBugs(projectId, filter){
-        
-    }
-
-    updateBug(id, newModel){
+    async updateBug(id, newModel){
         
         
     }
 
-    modifyBug(id, key, value){
+    async modifyBug(id, key, value){
         
     }
 
-    deleteBug(id){
+    async deleteBug(id){
         
+    }
+
+    async deleteProject(id){
+        const result = await this._ProjectModel.deleteOne({_id: id});
+
+        return result.deletedCount > 0;
     }
 }
 
@@ -209,43 +238,44 @@ export class DataManager{
         await this.database.disconnect();
     }
 
-    createProject(name, description){
-        return this.database.addProject(name, description);
+    async createProject(name, description){
+        const model = await this.database.addProject(name, description);
+        return model;
     }
 
-    createBug(projectId, name, description, level){
+    async createBug(projectId, name, description, level){
         return this.database.addBug(projectId, level, name, description);
     }
 
-    getProject(id){
+    async getProject(id){
         return this.database.getProject(id);
     }
 
-    getBug(id){
+    async getBug(id){
         return this.database.getBug(id);
     }
 
-    getBugs(projectId){
+    async getBugs(projectId){
         return this.database.getBugs(projectId, bug => bug.projectId === projectId && bug.archived === false);
     }
 
-    getArchivedBugs(projectId){
+    async getArchivedBugs(projectId){
         return this.database.getBugs(projectId, bug => bug.projectId === projectId && bug.archived === true);
     }
 
-    archiveBug(id){
+    async archiveBug(id){
         this.database.modifyBug(id, "archived", true);
     }
 
-    unarchiveBug(id){
+    async unarchiveBug(id){
         this.database.modifyBug(id, "archived", false);
     }
 
-    deleteBug(id){
+    async deleteBug(id){
         this.database.deleteBug(id);
     }
 
-    deleteProject(id){
-
+    async deleteProject(id){
+        return this.database.deleteProject(id);
     }
 }
