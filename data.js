@@ -186,19 +186,36 @@ export class MongoDatabase extends Database{
 
         await project.save();
 
-        return project.toObject();
+        return this.__toRawProject(project.toObject());
     }
 
     async addBug(projectId, level, name, description){
-        
+        let bug = new this._BugModel({
+            projectId: projectId,
+            name: name,
+            description: description,
+            level: level,
+            archived: false
+        });
+
+        await bug.save();
+        return this.__toRawBug(bug.toObject());
     }
 
     async getProject(id){
-        
+        const project = await this._ProjectModel.findById({_id: id});
+        if (project == null)
+            throw new Error(`Project with id ${id} not found!`);
+
+        return this.__toRawProject(project);
     }
 
     async getBug(id){
-        
+        const bug = await this._BugModel.findById({_id: id});
+        if (bug == null)
+            throw new Error(`Bug with id ${id} not found!`);
+
+        return this.__toRawBug(bug);
     }
 
     async getBugs(projectId, filter){
@@ -215,13 +232,32 @@ export class MongoDatabase extends Database{
     }
 
     async deleteBug(id){
-        
+        return (await this._BugModel.deleteOne({_id: id})).deletedCount > 0;
     }
 
     async deleteProject(id){
         const result = await this._ProjectModel.deleteOne({_id: id});
 
         return result.deletedCount > 0;
+    }
+
+    async __toRawProject(project){
+        return {
+            id: project._id,
+            name: project.name,
+            description: project.description
+        }
+    }
+
+    async __toRawBug(bug){
+        return {
+            id: bug._id,
+            projectId: bug.projectId,
+            name: bug.name,
+            description: bug.description,
+            level: bug.level,
+            archived: bug.archived
+        }
     }
 }
 
@@ -272,7 +308,7 @@ export class DataManager{
     }
 
     async deleteBug(id){
-        this.database.deleteBug(id);
+        return this.database.deleteBug(id);
     }
 
     async deleteProject(id){
