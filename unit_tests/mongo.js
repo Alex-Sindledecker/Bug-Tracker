@@ -20,9 +20,9 @@ const projectTest = async (name, description) => {
 
         const q = await db.getProject(p.id);
         if (q.name === name && q.description === description && q._id === p._id)
-            logSuccess("\t\tGet Project");
+            logSuccess("\t\tRead Project");
         else
-            logFailure("\t\tGet Project");
+            logFailure("\t\tRead Project");
 
         const r = await db.deleteProject(p.id);
         if (r === true)
@@ -48,11 +48,30 @@ const bugTest = async (name, description, level) => {
 
         const q1 = await db.getBug(p.id);
         if (q1.projectId.equals(p.projectId) && q1.name === p.name && q1.description === p.description && q1.level === p.level)
-            logSuccess("\t\tGet Bug");
+            logSuccess("\t\tRead Bug");
         else
-            logFailure("\t\tGet Bug");
+            logFailure("\t\tRead Bug");
 
-        //const q2 = await dataManager.upd
+        const q2 = await db.updateBug(q1.id, {
+            projectId: projectId,
+            name: "--UPDATE-BUG-TEST--",
+            description: "--UPDATE-BUG-TEST-DESCRIPTION--",
+            level: -1,
+            archived: false
+        });
+
+        if (q2.projectId.equals(projectId) && q2.name === "--UPDATE-BUG-TEST--" && q2.description === "--UPDATE-BUG-TEST-DESCRIPTION--" && q2.level === -1 && q2.archived === false)
+            logSuccess("\t\tUpdate Bug (1/2)");
+        else
+            logFailure("\t\tUpdate Bug (1/2)");
+
+
+        const q3 = await db.modifyBug(q1.id, "archived", true);
+        if (q3.archived === true)
+            logSuccess("\t\tUpdate Bug (2/2)");
+        else
+            logFailure("\t\tUpdate Bug (2/2)");
+
 
         if (await db.deleteBug(p.id) === true)
             logSuccess("\t\tDelete Bug");

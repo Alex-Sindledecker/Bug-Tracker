@@ -223,17 +223,25 @@ export class MongoDatabase extends Database{
     }
 
     async updateBug(id, newModel){
-        return await this._BugModel.findOneAndUpdate({_id: id}, {
+        await this._BugModel.updateOne({_id: id}, {
             projectId: newModel.projectId,
             name: newModel.name,
             description: newModel.description,
             level: newModel.level,
             archived: newModel.archived
         });
+        const model = await this._BugModel.findOne({_id: id});
+
+        return this.__toRawBug(model);
     }
 
     async modifyBug(id, key, value){
-        
+        await this._BugModel.updateOne({_id: id}, {
+            [key]: value
+        });
+        const model = await this._BugModel.findOne({_id: id});
+
+        return this.__toRawBug(model);
     }
 
     async deleteBug(id){
