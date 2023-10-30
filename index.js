@@ -8,17 +8,18 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const bypassLogin = true;
 const port = 3000;
+
 const app = express();
 
-let database = new MongoDatabase();
-//const projectId = database.addProject("My Project", "Dev project").id;
+let database = new InstanceDatabase();
+const projectId = await database.addProject("My Project", "Dev project").id;
 let dataManager = new DataManager(database);
-await dataManager.initDb("mongodb://127.0.0.1:27017/bugtrackerdb");
+await dataManager.initDb("");
 
-//dataManager.createBug(projectId, "Level 4 bug", "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.", 4);
-//dataManager.createBug(projectId, "Level 3 bug", "Fix this thing in this other place",3 );
-//dataManager.createBug(projectId, "Level 2 bug", "Fix this thing in a hypothetical place", 2);
-//dataManager.createBug(projectId, "Level 1 bug", "Fix this thing in a different place", 1);
+await dataManager.createBug(projectId, "Level 4 bug", "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.", 4);
+await dataManager.createBug(projectId, "Level 3 bug", "Fix this thing in this other place",3 );
+await dataManager.createBug(projectId, "Level 2 bug", "Fix this thing in a hypothetical place", 2);
+await dataManager.createBug(projectId, "Level 1 bug", "Fix this thing in a different place", 1);
 
 app.use(express.static("static"));
 app.use(bodyParser.urlencoded({extended: true}));
@@ -30,10 +31,10 @@ app.get("/", (req, res) => {
         res.render(__dirname + "/views/index.ejs", {username: "Dev123"});
 });
 
-app.get("/project/:id", (req, res) => {
+app.get("/project/:id", async (req, res) => {
     try{
-        const project = dataManager.getProject(req.params.id);
-        const bugs = dataManager.getBugs(project.id);
+        const project = await dataManager.getProject(req.params.id);
+        const bugs = await dataManager.getBugs(project.id);
 
         res.render(__dirname + "/views/project.ejs", {project: project, bugs: bugs, archivePage: false});
     } catch (error){
@@ -42,12 +43,12 @@ app.get("/project/:id", (req, res) => {
     }
 });
 
-app.post("/project/:id/archive", (req, res) => {
+app.post("/project/:id/archive", async (req, res) => {
     const projectId = req.params.id;
     const bugId = req.body.id;
 
     try{
-        dataManager.archiveBug(bugId);
+        await dataManager.archiveBug(bugId);
 
         res.sendStatus(200);
     }
@@ -57,10 +58,10 @@ app.post("/project/:id/archive", (req, res) => {
     }
 });
 
-app.get("/project/:id/archive", (req, res) => {
+app.get("/project/:id/archive", async (req, res) => {
     try{
-        const project = dataManager.getProject(req.params.id);
-        const bugs = dataManager.getArchivedBugs(project.id);
+        const project = await dataManager.getProject(req.params.id);
+        const bugs = await dataManager.getArchivedBugs(project.id);
 
         res.render(__dirname + "/views/project.ejs", {project: project, bugs: bugs, archivePage: true});
     } catch (error){
@@ -69,12 +70,12 @@ app.get("/project/:id/archive", (req, res) => {
     }
 });
 
-app.post("/project/:id/restore", (req, res) => {
+app.post("/project/:id/restore", async (req, res) => {
     const projectId = req.params.id;
     const bugId = req.body.id;
 
     try{
-        dataManager.unarchiveBug(bugId);
+        await dataManager.unarchiveBug(bugId);
 
         res.sendStatus(200);
     }
@@ -84,11 +85,11 @@ app.post("/project/:id/restore", (req, res) => {
     }
 });
 
-app.post("/project/:id/delete", (req, res) => {
+app.post("/project/:id/delete", async (req, res) => {
     const bugId = req.body.id;
 
     try{
-        dataManager.deleteBug(bugId);
+        await dataManager.deleteBug(bugId);
 
         res.sendStatus(200);
     } catch (error){
@@ -97,7 +98,7 @@ app.post("/project/:id/delete", (req, res) => {
     }
 });
 
-app.post("/project/:id/new", (req, res) => {
+app.post("/project/:id/new", async (req, res) => {
     const projectId = Number.parseInt(req.params.id);
     const dataModel = {
         level: Number.parseInt(req.body.level),
@@ -106,7 +107,7 @@ app.post("/project/:id/new", (req, res) => {
     }
 
     //TODO: request validation
-    console.log(dataManager.createBug(projectId, dataModel.name, dataModel.description, dataModel.level));
+    console.log(await dataManager.createBug(projectId, dataModel.name, dataModel.description, dataModel.level));
 
     res.redirect("/project/" + projectId);
 });
