@@ -219,7 +219,15 @@ export class MongoDatabase extends Database{
     }
 
     async getBugs(projectId, filter){
-        
+        filter.projectId = projectId;
+
+        let models = [];
+
+        for await (const model of this._BugModel.find(filter)){
+            models.push(await this.__toRawBug(model));
+        }
+
+        return models;
     }
 
     async updateBug(id, newModel){

@@ -3,9 +3,6 @@ import { DataManager, MongoDatabase} from "../data.js";
 
 let db = new MongoDatabase();
 await db.init("mongodb://127.0.0.1:27017/bugtrackerdb");
-//let dataManager = new DataManager(db);
-
-//await dataManager.initDb("mongodb://127.0.0.1:27017/bugtrackerdb");
 
 const projectTest = async (name, description) => {
     try{
@@ -48,11 +45,19 @@ const bugTest = async (name, description, level) => {
 
         const q1 = await db.getBug(p.id);
         if (q1.projectId.equals(p.projectId) && q1.name === p.name && q1.description === p.description && q1.level === p.level)
-            logSuccess("\t\tRead Bug");
+            logSuccess("\t\tRead Bug (1/2)");
         else
-            logFailure("\t\tRead Bug");
+            logFailure("\t\tRead Bug (1/2)");
 
-        const q2 = await db.updateBug(q1.id, {
+        const _q2 = await db.addBug(projectId, 4, "--DELETE--", "--DELETE--");
+        const q2 = await db.getBugs(projectId,  {archived: false});
+        if (q2.length === 2)
+            logSuccess("\t\tRead Bug(s) (2/2)");
+        else
+            logFailure("\t\tRead Bug(s) (2/2)");
+        await db.deleteBug(_q2.id);
+
+        const q3 = await db.updateBug(q1.id, {
             projectId: projectId,
             name: "--UPDATE-BUG-TEST--",
             description: "--UPDATE-BUG-TEST-DESCRIPTION--",
@@ -60,14 +65,14 @@ const bugTest = async (name, description, level) => {
             archived: false
         });
 
-        if (q2.projectId.equals(projectId) && q2.name === "--UPDATE-BUG-TEST--" && q2.description === "--UPDATE-BUG-TEST-DESCRIPTION--" && q2.level === -1 && q2.archived === false)
+        if (q3.projectId.equals(projectId) && q3.name === "--UPDATE-BUG-TEST--" && q3.description === "--UPDATE-BUG-TEST-DESCRIPTION--" && q3.level === -1 && q3.archived === false)
             logSuccess("\t\tUpdate Bug (1/2)");
         else
             logFailure("\t\tUpdate Bug (1/2)");
 
 
-        const q3 = await db.modifyBug(q1.id, "archived", true);
-        if (q3.archived === true)
+        const q4 = await db.modifyBug(q1.id, "archived", true);
+        if (q4.archived === true)
             logSuccess("\t\tUpdate Bug (2/2)");
         else
             logFailure("\t\tUpdate Bug (2/2)");
