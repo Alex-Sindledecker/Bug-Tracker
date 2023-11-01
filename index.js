@@ -11,15 +11,14 @@ const port = 3000;
 
 const app = express();
 
-let database = new InstanceDatabase();
-const projectId = await database.addProject("My Project", "Dev project").id;
+let database = new MongoDatabase();
 let dataManager = new DataManager(database);
-await dataManager.initDb("");
+await dataManager.initDb("mongodb://127.0.0.1:27017/bugtrackerdb");
 
-await dataManager.createBug(projectId, "Level 4 bug", "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.", 4);
-await dataManager.createBug(projectId, "Level 3 bug", "Fix this thing in this other place",3 );
-await dataManager.createBug(projectId, "Level 2 bug", "Fix this thing in a hypothetical place", 2);
-await dataManager.createBug(projectId, "Level 1 bug", "Fix this thing in a different place", 1);
+//await dataManager.createBug(projectId, "Level 4 bug", "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.", 4);
+//await dataManager.createBug(projectId, "Level 3 bug", "Fix this thing in this other place",3 );
+//await dataManager.createBug(projectId, "Level 2 bug", "Fix this thing in a hypothetical place", 2);
+//await dataManager.createBug(projectId, "Level 1 bug", "Fix this thing in a different place", 1);
 
 app.use(express.static("static"));
 app.use(bodyParser.urlencoded({extended: true}));
@@ -99,7 +98,7 @@ app.post("/project/:id/delete", async (req, res) => {
 });
 
 app.post("/project/:id/new", async (req, res) => {
-    const projectId = Number.parseInt(req.params.id);
+    const projectId = req.params.id;
     const dataModel = {
         level: Number.parseInt(req.body.level),
         name: req.body.name,
@@ -107,7 +106,7 @@ app.post("/project/:id/new", async (req, res) => {
     }
 
     //TODO: request validation
-    console.log(await dataManager.createBug(projectId, dataModel.name, dataModel.description, dataModel.level));
+    await dataManager.createBug(projectId, dataModel.name, dataModel.description, dataModel.level);
 
     res.redirect("/project/" + projectId);
 });

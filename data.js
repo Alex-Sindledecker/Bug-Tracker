@@ -1,4 +1,4 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose, {Schema, Types} from "mongoose";
 
 class Database{
     constructor(){
@@ -109,7 +109,7 @@ export class InstanceDatabase extends Database{
     }
 
     getBugs(projectId, filter){
-        return this.bugs.filter(filter);
+        return this.bugs.filter(this.__convertFilter(filter));
     }
 
     updateBug(id, newModel){
@@ -140,6 +140,18 @@ export class InstanceDatabase extends Database{
     __validateBug(id){
         if (this.bugs[id] === null)
             throw new Error(`Could not find the bug with id '${id}`);
+    }
+
+    //Converts a filter to the required format
+    __convertFilter(filter){
+        return (model) => {
+            let result = true;
+            Object.keys(filter).forEach(key => {
+                if (model[key] !== filter[key])
+                    result = false;
+            });
+            return result;
+        }
     }
 }
 
@@ -191,7 +203,7 @@ export class MongoDatabase extends Database{
 
     async addBug(projectId, level, name, description){
         let bug = new this._BugModel({
-            projectId: projectId,
+            projectId: new Types.ObjectId(projectId),
             name: name,
             description: description,
             level: level,
@@ -203,7 +215,7 @@ export class MongoDatabase extends Database{
     }
 
     async getProject(id){
-        const project = await this._ProjectModel.findById({_id: id});
+        const project = await this._ProjectModel.findById({_id: new Types.ObjectId(id)});
         if (project == null)
             throw new Error(`Project with id ${id} not found!`);
 
@@ -211,7 +223,7 @@ export class MongoDatabase extends Database{
     }
 
     async getBug(id){
-        const bug = await this._BugModel.findById({_id: id});
+        const bug = await this._BugModel.findById({_id: new Types.ObjectId(id)});
         if (bug == null)
             throw new Error(`Bug with id ${id} not found!`);
 
@@ -219,11 +231,9 @@ export class MongoDatabase extends Database{
     }
 
     async getBugs(projectId, filter){
-        filter.projectId = projectId;
-
         let models = [];
 
-        for await (const model of this._BugModel.find(filter)){
+        for await (const model of this._BugModel.find(this.__convertFilter(filter))){
             models.push(await this.__toRawBug(model));
         }
 
@@ -231,40 +241,40 @@ export class MongoDatabase extends Database{
     }
 
     async updateBug(id, newModel){
-        await this._BugModel.updateOne({_id: id}, {
-            projectId: newModel.projectId,
+        await this._BugModel.updateOne({_id: new Types.ObjectId(id)}, {
+            projectId: new Types.ObjectId(newModel.projectId),
             name: newModel.name,
             description: newModel.description,
             level: newModel.level,
             archived: newModel.archived
         });
-        const model = await this._BugModel.findOne({_id: id});
+        const model = await this._BugModel.findOne({_id: new Types.ObjectId(id)});
 
         return this.__toRawBug(model);
     }
 
     async modifyBug(id, key, value){
-        await this._BugModel.updateOne({_id: id}, {
+        await this._BugModel.updateOne({_id: new Types.ObjectId(id)}, {
             [key]: value
         });
-        const model = await this._BugModel.findOne({_id: id});
+        const model = await this._BugModel.findOne({_id: new Types.ObjectId(id)});
 
         return this.__toRawBug(model);
     }
 
     async deleteBug(id){
-        return (await this._BugModel.deleteOne({_id: id})).deletedCount > 0;
+        return (await this._BugModel.deleteOne({_id: new Types.ObjectId(id)})).deletedCount > 0;
     }
 
     async deleteProject(id){
-        const result = await this._ProjectModel.deleteOne({_id: id});
+        const result = await this._ProjectModel.deleteOne({_id: new Types.ObjectId(id)});
 
         return result.deletedCount > 0;
     }
 
     async __toRawProject(project){
         return {
-            id: project._id,
+            id: project._id.toString(),
             name: project.name,
             description: project.description
         }
@@ -272,13 +282,25 @@ export class MongoDatabase extends Database{
 
     async __toRawBug(bug){
         return {
-            id: bug._id,
-            projectId: bug.projectId,
+            id: bug._id.toString(),
+            projectId: bug.projectId.toString(),
             name: bug.name,
             description: bug.description,
             level: bug.level,
             archived: bug.archived
         }
+    }
+
+    //Returns the same filter, but with any id reshaped into a 'Schema.ObjectId'
+    __convertFilter(filter){
+        let result = filter;
+
+        Object.keys(filter).forEach(key => {
+            if (key === "projectId" || key == "id")
+                result[key] = new Types.ObjectId(filter[key]);
+        });
+
+        return result;
     }
 }
 
@@ -313,11 +335,17 @@ export class DataManager{
     }
 
     async getBugs(projectId){
-        return this.database.getBugs(projectId, bug => bug.projectId === projectId && bug.archived === false);
+        return this.database.getBugs(projectId, {
+            projectId: projectId,
+            archived: false
+        });
     }
 
     async getArchivedBugs(projectId){
-        return this.database.getBugs(projectId, bug => bug.projectId === projectId && bug.archived === true);
+        return this.database.getBugs(projectId, {
+            projectId: projectId,
+            archived: true
+        });
     }
 
     async archiveBug(id){

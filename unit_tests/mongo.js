@@ -37,14 +37,14 @@ const bugTest = async (name, description, level) => {
     {
         const projectId = (await db.addProject("--DELETE--", "--DELETE--")).id;
         const p = await db.addBug(projectId, level, name, description);
-        if (p.projectId.equals(projectId) && p.name === name && p.description === description && p.level === level && p.id !== null)
+        if (p.projectId === projectId && p.name === name && p.description === description && p.level === level && p.id !== null)
             logSuccess("\t\tCreate Bug");
         else{
             logFailure("\t\tCreate Bug");
         }
 
         const q1 = await db.getBug(p.id);
-        if (q1.projectId.equals(p.projectId) && q1.name === p.name && q1.description === p.description && q1.level === p.level)
+        if (q1.projectId === p.projectId && q1.name === p.name && q1.description === p.description && q1.level === p.level)
             logSuccess("\t\tRead Bug (1/2)");
         else
             logFailure("\t\tRead Bug (1/2)");
@@ -65,7 +65,7 @@ const bugTest = async (name, description, level) => {
             archived: false
         });
 
-        if (q3.projectId.equals(projectId) && q3.name === "--UPDATE-BUG-TEST--" && q3.description === "--UPDATE-BUG-TEST-DESCRIPTION--" && q3.level === -1 && q3.archived === false)
+        if (q3.projectId === projectId && q3.name === "--UPDATE-BUG-TEST--" && q3.description === "--UPDATE-BUG-TEST-DESCRIPTION--" && q3.level === -1 && q3.archived === false)
             logSuccess("\t\tUpdate Bug (1/2)");
         else
             logFailure("\t\tUpdate Bug (1/2)");
