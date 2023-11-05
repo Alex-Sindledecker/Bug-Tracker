@@ -16,7 +16,7 @@ $("#daylight-button").click(() => {
             "--color1": "#79155B",
             "--color2": "#C23373",
             "--color3": "#F6635C",
-            "--color4": "#FFBA86",
+            "--color4": "rgb(80,80,80)",
             "--font-color": "white",
             "--card-background": "#363436"
         });
@@ -31,7 +31,7 @@ $("#daylight-button").click(() => {
             "--color1": "#79155B",
             "--color2": "#C23373",
             "--color3": "#F6635C",
-            "--color4": "#FFBA86",
+            "--color4": "rgb(80,80,80)",
             "--font-color": "#323232",
             "--card-background": "#d4d4d4"
         });
@@ -74,7 +74,7 @@ $(".close-overlay-button").click(function(){
 
 $(".level-selection").click(function(){
     $("#level").attr("value", $(this).attr("name"));
-	$(".level-selection").css("background-color", "white");
+	$(".level-selection").css("background-color", "var(--card-background)");
     switch ($(this).attr("name")){
         case "4":
             $(this).css("background-color", "magenta");

@@ -30,6 +30,10 @@ app.get("/", (req, res) => {
         res.render(__dirname + "/views/index.ejs", {username: "Dev123"});
 });
 
+app.get("/login", (req, res) => {
+    res.render(__dirname + "/views/login.ejs");
+});
+
 app.get("/project/:id", async (req, res) => {
     try{
         const project = await dataManager.getProject(req.params.id);
@@ -104,7 +108,6 @@ app.post("/project/:id/new", async (req, res) => {
         name: req.body.name,
         description: req.body.description
     }
-
     //TODO: request validation
     await dataManager.createBug(projectId, dataModel.name, dataModel.description, dataModel.level);
 
@@ -113,4 +116,5 @@ app.post("/project/:id/new", async (req, res) => {
 
 app.listen(port, () => {
     console.log("App running on port " + port);
+    console.log("Dev project running on http://localhost:3000/project/6541eaa9e357f47d45b32a4c");
 });
