@@ -45,6 +45,7 @@ a{
     transform: rotate(360deg);
 }
 
+
 .huge-text{
     font-size: 4em;
 }
@@ -319,6 +320,14 @@ a{
 
 .other-login-options > a{
     scale: 1.5;
+}
+
+.warning-text{
+    color: red;
+}
+
+#password-match-warning{
+    display: none;
 }
 
 @media (max-width: 1025px){
