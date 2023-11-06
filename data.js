@@ -307,6 +307,7 @@ export class MongoDatabase extends Database{
 export class DataManager{
     constructor(database){
         this.database = database;
+        this.password = null;
     }
 
     async initDb(dbUrl){
@@ -315,6 +316,14 @@ export class DataManager{
 
     async closeDb(){
         await this.database.disconnect();
+    }
+
+    async createNewUser(username, password){
+        return {username: "a@b.com", password: "$2b$10$kRVGfoXMEpZRVzG8j.3mheEdlw667mZG/nryL.9EPzjPKgSiCtzWy"};
+    }
+
+    async getUser(username){
+        return {username: "a@b.com", password: "$2b$10$kRVGfoXMEpZRVzG8j.3mheEdlw667mZG/nryL.9EPzjPKgSiCtzWy"};
     }
 
     async createProject(name, description){

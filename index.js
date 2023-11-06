@@ -1,6 +1,11 @@
+import "dotenv/config";
 import express from "express";
 import bodyParser from "body-parser";
 import {InstanceDatabase, DataManager, MongoDatabase} from "./data.js";
+import session from "express-session";
+import passport from "passport";
+import LocalStrategy from "passport-local";
+import bcrypt from "bcrypt";
 
 import {dirname} from "path";
 import { fileURLToPath } from "url";
@@ -8,20 +13,49 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const bypassLogin = true;
 const port = 3000;
+const saltRounds = 10;
 
 const app = express();
 
 let database = new MongoDatabase();
 let dataManager = new DataManager(database);
-await dataManager.initDb("mongodb://127.0.0.1:27017/bugtrackerdb");
-
-//await dataManager.createBug(projectId, "Level 4 bug", "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.", 4);
-//await dataManager.createBug(projectId, "Level 3 bug", "Fix this thing in this other place",3 );
-//await dataManager.createBug(projectId, "Level 2 bug", "Fix this thing in a hypothetical place", 2);
-//await dataManager.createBug(projectId, "Level 1 bug", "Fix this thing in a different place", 1);
+await dataManager.initDb(process.env.MONGO_URL);
 
 app.use(express.static("static"));
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(session({
+    secret: process.env.SESSION_KEY,
+    resave: false,
+    saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new LocalStrategy(async (username, password, cb) => {
+    const user = await dataManager.getUser(username);
+
+    if (user == null)
+        return cb(null, false, {message: `Could not find a user with username: ${username}`});
+
+    bcrypt.compare(password, user.password, (err, result) => {
+        if (err)
+            return cb(err);
+        if (result == false)
+            return cb(null, false);
+
+        return cb(null, user);
+    });
+}));
+
+passport.serializeUser((user, cb) => {
+    cb(null, {
+        email: user.email
+    });
+});
+
+passport.deserializeUser((user, cb) => {
+    cb(null, user);
+});
 
 app.get("/", (req, res) => {
     if (bypassLogin === false)
@@ -31,11 +65,60 @@ app.get("/", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-    res.render(__dirname + "/views/login.ejs");
+    if (req.isAuthenticated())
+        res.redirect("http://localhost:3000/project/6541eaa9e357f47d45b32a4c");
+    else
+        res.render(__dirname + "/views/login.ejs");
 });
 
+app.post("/login", passport.authenticate("local", {
+    successRedirect: "http://localhost:3000/project/6541eaa9e357f47d45b32a4c",
+    failureRedirect: "/login",
+    failureMessage: true
+}));
+
 app.get("/signup", (req, res) => {
+    if (req.isAuthenticated()){
+        return res.redirect("http://localhost:3000/project/6541eaa9e357f47d45b32a4c");
+    }
+
     res.render(__dirname + "/views/signup.ejs");
+});
+
+app.post("/signup", async (req, res) => {
+    const email = req.body.email;
+    const password = req.body.password;
+
+    //Validate email and password here
+
+    //if (await dataManager.getUser(email) != null){
+    //    res.render(__dirname + "/views/signup.ejs", {email: email});
+    //} else {
+        bcrypt.hash(password, saltRounds, (err, hash) => {
+            const user = dataManager.createNewUser(email, hash);
+            
+            if (user != null){
+                req.login(user, err => {
+                    console.log(err);
+                    if (err){
+                        return res.redirect("/signup");
+                    } else {
+                        return res.redirect("http://localhost:3000/project/6541eaa9e357f47d45b32a4c");
+                    }
+                });
+            }
+        });
+    //}
+
+});
+
+app.get("/logout", (req, res) => {
+    if (req.isAuthenticated()){
+        req.logOut(err => {
+            if (err) console.log(err);
+            res.redirect("/");
+        });
+    }
 });
 
 app.get("/project/:id", async (req, res) => {
