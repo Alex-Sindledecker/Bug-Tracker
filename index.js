@@ -49,7 +49,7 @@ passport.use(new LocalStrategy(async (username, password, cb) => {
 
 passport.serializeUser((user, cb) => {
     cb(null, {
-        email: user.email
+        email: user.username
     });
 });
 
@@ -86,16 +86,16 @@ app.get("/signup", (req, res) => {
 });
 
 app.post("/signup", async (req, res) => {
-    const email = req.body.email;
+    const username = req.body.username;
     const password = req.body.password;
 
-    //Validate email and password here
+    //Validate username and password here
 
-    //if (await dataManager.getUser(email) != null){
-    //    res.render(__dirname + "/views/signup.ejs", {email: email});
-    //} else {
+    if (await dataManager.getUser(username) != null){
+        res.render(__dirname + "/views/signup.ejs", {email: username});
+    } else {
         bcrypt.hash(password, saltRounds, (err, hash) => {
-            const user = dataManager.createNewUser(email, hash);
+            const user = dataManager.createNewUser(username, hash);
             
             if (user != null){
                 req.login(user, err => {
@@ -108,7 +108,7 @@ app.post("/signup", async (req, res) => {
                 });
             }
         });
-    //}
+    }
 
 });
 

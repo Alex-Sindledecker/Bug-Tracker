@@ -6,11 +6,19 @@ class Database{
             throw new Error("Cannot instantiate abstract class 'Database'!");
     }
 
-    async init(url){
+    addUser(username, password){
+        throw new Error("Method 'addUser()' must be implemented!");
+    }
+
+    getUser(username){
+        throw new Error("Method 'getUser()' must be implemented!");
+    }
+
+    init(url){
         throw new Error("Method 'init()' must be implemented!");
     }
 
-    async disconnect(url){
+    disconnect(url){
         throw new Error("Method 'disconnect()' must be implemented!");
     }
 
@@ -174,8 +182,15 @@ export class MongoDatabase extends Database{
         }
 
         this._projectSchema = {
+            ownerId: Schema.ObjectId,
             name: String,
             description: String
+        }
+
+        this._userSchema = {
+            username: String,
+            password: String,
+            projects: [Schema.ObjectId]
         }
     }
 
@@ -184,10 +199,36 @@ export class MongoDatabase extends Database{
 
         this._BugModel = mongoose.model("bug", this._bugSchema);
         this._ProjectModel = mongoose.model("project", this._projectSchema);
+        this._UserModel = mongoose.model("user", this._userSchema);
     }
 
     async disconnect(){
         await mongoose.disconnect();
+    }
+
+    async addUser(username, password){
+        let user = new this._UserModel({
+            username: username,
+            password: password,
+            projects: []
+        });
+
+        await user.save();
+
+        return {username: username, password: password};
+    }
+
+    async getUser(username){
+        const user = await this._UserModel.findOne({username: username});
+
+        if (user == null)
+            return null;
+
+        return {
+            username: user.username,
+            password: user.password,
+            project: user.projects
+        };
     }
 
     async addProject(name, description){
@@ -319,11 +360,11 @@ export class DataManager{
     }
 
     async createNewUser(username, password){
-        return {username: "a@b.com", password: "$2b$10$kRVGfoXMEpZRVzG8j.3mheEdlw667mZG/nryL.9EPzjPKgSiCtzWy"};
+        return await this.database.addUser(username, password);
     }
 
     async getUser(username){
-        return {username: "a@b.com", password: "$2b$10$kRVGfoXMEpZRVzG8j.3mheEdlw667mZG/nryL.9EPzjPKgSiCtzWy"};
+        return await this.database.getUser(username);
     }
 
     async createProject(name, description){
