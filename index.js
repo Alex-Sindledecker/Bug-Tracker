@@ -1,11 +1,13 @@
 import "dotenv/config";
 import express from "express";
 import bodyParser from "body-parser";
-import {InstanceDatabase, DataManager, MongoDatabase} from "./data.js";
 import session from "express-session";
 import passport from "passport";
 import LocalStrategy from "passport-local";
 import bcrypt from "bcrypt";
+
+import { MongoDatabase } from "./data/mongo_database.js";
+import { DataManager } from "./data/data_manager.js";
 
 import {dirname} from "path";
 import { fileURLToPath } from "url";
@@ -55,6 +57,11 @@ passport.serializeUser((user, cb) => {
 
 passport.deserializeUser((user, cb) => {
     cb(null, user);
+});
+
+app.get("/test", (req, res) => {
+    dataManager.giveProject("6541eaa9e357f47d45b32a4c", "a@b.com");
+    res.redirect("http://localhost:3000/project/6541eaa9e357f47d45b32a4c");
 });
 
 app.get("/", (req, res) => {
