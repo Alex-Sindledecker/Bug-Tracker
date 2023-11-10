@@ -33,6 +33,12 @@ a{
     color: var(--font-color);
 }
 
+hr{
+    background: linear-gradient(to right, var(--color2), var(--color3));
+    height: 3px;
+    border: none;
+}
+
 #daylight-button{
     background: none;
     border: none;
@@ -44,7 +50,6 @@ a{
 #daylight-button:hover{
     transform: rotate(360deg);
 }
-
 
 .huge-text{
     font-size: 4em;
@@ -113,15 +118,15 @@ a{
     border-radius: 10px;
 }
 
-.add-bug-card{
+.button-card{
     align-self: stretch;
 }
 
-.add-bug-card > svg{
+.button-card > svg{
     scale: 1.3;
 }
 
-.add-bug-card:hover{
+.button-card:hover{
     cursor: pointer;
 }
 
@@ -327,6 +332,28 @@ a{
 }
 
 #password-match-warning{
+    display: none;
+}
+
+.visible-break{
+    border: 1px solid white;
+}
+
+.big-title{
+    padding: 2rem;
+}
+
+.project-grid{
+    display: grid;
+    grid-auto-flow: row dense;
+    padding: 2rem;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: max-content;
+    column-gap: 2em;
+    row-gap: 4em;
+}
+
+.hidden{
     display: none;
 }
 

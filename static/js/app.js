@@ -8,8 +8,6 @@ const nightSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
 
 let darkMode = true;
 
-$("#add-bug-overlay").hide();
-
 $("#daylight-button").click(() => {
     if (darkMode === false){
         $(":root").css({
@@ -65,11 +63,11 @@ $(".card-button").click(function(){
 });
 
 $(".add-bug-card").click(() => {
-    $("#add-bug-overlay").show();
+    $("#add-bug-overlay").removeClass("hidden");
 });
 
 $(".close-overlay-button").click(function(){
-    $(this).parents(".site-overlay").hide();
+    $(this).parents(".site-overlay").addClass("hidden");
 });
 
 $(".level-selection").click(function(){

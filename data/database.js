@@ -40,6 +40,10 @@ export default class Database{
         throw new Error("Method 'getProject()' must be implemented!");
     }
 
+    getProjects(filter){
+        throw new Error("Method 'getProjects()' must be implemented!");
+    }
+
     getProjects(username){
         throw new Error("Method 'getProjects()' must be implemented!");
     }

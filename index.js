@@ -13,7 +13,6 @@ import {dirname} from "path";
 import { fileURLToPath } from "url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const bypassLogin = true;
 const port = 3000;
 const saltRounds = 10;
 
@@ -59,34 +58,39 @@ passport.deserializeUser((user, cb) => {
     cb(null, user);
 });
 
-app.get("/test", (req, res) => {
-    dataManager.giveProject("6541eaa9e357f47d45b32a4c", "a@b.com");
-    res.redirect("http://localhost:3000/project/6541eaa9e357f47d45b32a4c");
-});
+app.get("/", async (req, res) => {
+    if (req.isAuthenticated()){
+        dataManager.getProjects(req.user.email).then(projects => {
+            const ownerProjects = projects.filter(project => project.ownerUsername === req.user.email);
+            const collabProjects = projects.filter(project => project.ownerUsername !== req.user.email);
 
-app.get("/", (req, res) => {
-    if (bypassLogin === false)
+            res.render(__dirname + "/views/index.ejs", {
+                username: req.user.email, 
+                ownerProjects: ownerProjects,
+                collabProjects: collabProjects
+            });
+        });
+    } else {
         res.render(__dirname + "/views/index.ejs");
-    else
-        res.render(__dirname + "/views/index.ejs", {username: "Dev123"});
+    }
 });
 
 app.get("/login", (req, res) => {
     if (req.isAuthenticated())
-        res.redirect("http://localhost:3000/project/6541eaa9e357f47d45b32a4c");
+        res.redirect("/");
     else
         res.render(__dirname + "/views/login.ejs");
 });
 
 app.post("/login", passport.authenticate("local", {
-    successRedirect: "http://localhost:3000/project/6541eaa9e357f47d45b32a4c",
+    successRedirect: "/",
     failureRedirect: "/login",
     failureMessage: true
 }));
 
 app.get("/signup", (req, res) => {
     if (req.isAuthenticated()){
-        return res.redirect("http://localhost:3000/project/6541eaa9e357f47d45b32a4c");
+        return res.redirect("/");
     }
 
     res.render(__dirname + "/views/signup.ejs");
@@ -110,7 +114,7 @@ app.post("/signup", async (req, res) => {
                     if (err){
                         return res.redirect("/signup");
                     } else {
-                        return res.redirect("http://localhost:3000/project/6541eaa9e357f47d45b32a4c");
+                        return res.redirect("/");
                     }
                 });
             }

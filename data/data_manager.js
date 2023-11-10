@@ -43,6 +43,16 @@ export class DataManager{
         return this.database.getProject(id);
     }
 
+    //Returns all projects that 'username' is involved in
+    async getProjects(username){
+        const user = await this.getUser(username);
+        return this.database.getProjects({
+            $array: {
+                _id: user.projects
+            }
+        });
+    }
+
     async getBug(id){
         return this.database.getBug(id);
     }

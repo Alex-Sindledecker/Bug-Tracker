@@ -1,2 +1,38 @@
 <header class="header"></header>
-<main class="main-content"></main>
+<main class="main-content">
+    <h1 class="big-title">My Projects</h3>
+    <hr/>
+    <div class="project-grid">
+        <div id="new-project-button" class="bug-card flex-center-all button-card">
+            New Project
+        </div>
+    </div>
+    <h1 class="big-title">Team Projects</h1>
+    <hr>
+    <div class="project-grid">
+        <div id="join-project-button" class="bug-card flex-center-all button-card">
+            Join Project
+        </div>
+    </div>
+
+    <form id="new-project-overlay" class="site-overlay hidden" method="post" action="">
+        <svg class="close-overlay-button" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+        </svg>
+        <h3>New Project</h3>
+        <input name="name" type="text" placeholder="Project Name" required/>
+        <textarea name="description" placeholder="Enter a project description" required></textarea>
+        <button class="overlay-button" type="submit">Create!</button>
+    </div>
+
+    <script>
+        $("#new-project-button").on("click", () => {
+            $("#new-project-overlay").removeClass("hidden");
+        });
+
+        $("#join-project-button").on("click", () => {
+
+        });
+    </script>
+
+</main>

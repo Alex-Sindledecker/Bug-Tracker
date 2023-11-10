@@ -60,7 +60,7 @@ export class MongoDatabase extends Database{
         return {
             username: user.username,
             password: user.password,
-            project: user.projects
+            projects: user.projects
         };
     }
 
@@ -94,6 +94,16 @@ export class MongoDatabase extends Database{
             throw new Error(`Project with id ${id} not found!`);
 
         return this.__toRawProject(project);
+    }
+
+    async getProjects(filter){
+        let projects = [];
+
+        for await (const model of this._ProjectModel.find(this.__convertFilter(filter))){
+            projects.push(await this.__toRawProject(model));
+        }
+
+        return projects;
     }
 
     async getBug(id){
@@ -166,7 +176,8 @@ export class MongoDatabase extends Database{
         return {
             id: project._id.toString(),
             name: project.name,
-            description: project.description
+            description: project.description,
+            ownerUsername: project.ownerUsername
         }
     }
 
@@ -186,8 +197,24 @@ export class MongoDatabase extends Database{
         let result = filter;
 
         Object.keys(filter).forEach(key => {
-            if (key === "projectId" || key == "id")
+            if (key === "projectId" || key == "_id")
                 result[key] = new Types.ObjectId(filter[key]);
+
+            if (key == "$array"){
+                const arr = filter[key];
+
+                Object.keys(arr).forEach(k => {
+                    let v = arr[k];
+                    if (k === "_id")
+                        v = v.map(i => new Types.ObjectId(i));
+
+                    result[k] = {
+                        $in: v
+                    };
+                });
+
+                delete result[key];
+            }
         });
 
         return result;
