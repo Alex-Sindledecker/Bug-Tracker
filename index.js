@@ -96,28 +96,33 @@ app.get("/signup", (req, res) => {
     res.render(__dirname + "/views/signup.ejs");
 });
 
+//Route for when the user posts their sign up info
 app.post("/signup", async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
     //Validate username and password here
 
+    //Validate that the user does not exist yet. If they do, redirect back to the signup page with the email currently in use
     if (await dataManager.getUser(username) != null){
         res.render(__dirname + "/views/signup.ejs", {email: username});
     } else {
+        //Create the new user.
+        //Begin by hashing their password
         bcrypt.hash(password, saltRounds, (err, hash) => {
-            const user = dataManager.createNewUser(username, hash);
-            
-            if (user != null){
-                req.login(user, err => {
-                    console.log(err);
-                    if (err){
-                        return res.redirect("/signup");
-                    } else {
-                        return res.redirect("/");
-                    }
-                });
-            }
+            //Create the user in the database with the given hash
+            dataManager.createNewUser(username, hash).then(user => {
+                //If the user is succesfully created, log them into the current passport session and redirect them to the next page
+                if (user != null){
+                    req.login(user, err => {
+                        if (err){
+                            return res.redirect("/signup");
+                        } else {
+                            return res.redirect("/");
+                        }
+                    });
+                }
+            });
         });
     }
 
