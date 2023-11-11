@@ -3,6 +3,16 @@
     <h1 class="big-title">My Projects</h3>
     <hr/>
     <div class="project-grid">
+        <% ownerProjects.forEach(project => { %>
+            <a href="/project/<%=project.id%>/">
+                <div class="bug-card">
+                    <div class="card-content">
+                        <h3 class="bug-card-title"><%= project.name %></h3>
+                        <p><%= project.description %></p>
+                    </div>
+                </div>
+            </a>
+        <% }); %>
         <div id="new-project-button" class="bug-card flex-center-all button-card">
             New Project
         </div>
@@ -10,6 +20,16 @@
     <h1 class="big-title">Team Projects</h1>
     <hr>
     <div class="project-grid">
+        <% collabProjects.forEach(project => { %>
+            <a href="/project/<%=project.id%>/">
+                <div class="bug-card">
+                    <div class="card-content">
+                        <h3 class="bug-card-title"><%= project.name %></h3>
+                        <p><%= project.description %></p>
+                    </div>
+                </div>
+            </a>
+        <% }); %>
         <div id="join-project-button" class="bug-card flex-center-all button-card">
             Join Project
         </div>
