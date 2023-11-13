@@ -20,7 +20,7 @@ export default class Database{
         throw new Error("Method 'disconnect()' must be implemented!");
     }
 
-    addProject(name, description){
+    addProject(creatorUsername, name, description){
         throw new Error("Method 'addProject()' must be implemented!");
     }
 

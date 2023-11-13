@@ -13,7 +13,7 @@ export class InstanceDatabase extends Database{
     async init(url){}
     async disconnect(){}
 
-    addProject(name, description){
+    addProject(creatorUsername, name, description){
         const model = {
             id: this.nextProjecctId,
             name: name,

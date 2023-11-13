@@ -26,16 +26,16 @@ export class DataManager{
         return null;
     }
 
-    async giveProject(projectId, username){
+    async giveProjectAccess(projectId, username){
         this.database.pushProjectToUser(username, projectId);
     }
 
-    async createProject(name, description){
-        const model = await this.database.addProject(name, description);
+    async createProject(creatorUsername, name, description){
+        const model = await this.database.addProject(creatorUsername, name, description);
         return model;
     }
 
-    async createBug(projectId, name, description, level){
+    async createBug(projectId, name, description, level){                
         return this.database.addBug(projectId, level, name, description);
     }
 

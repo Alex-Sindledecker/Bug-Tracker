@@ -64,8 +64,9 @@ export class MongoDatabase extends Database{
         };
     }
 
-    async addProject(name, description){
+    async addProject(creatorUsername, name, description){
         let project = new this._ProjectModel({
+            ownerUsername: creatorUsername,
             name: name,
             description: description
         });

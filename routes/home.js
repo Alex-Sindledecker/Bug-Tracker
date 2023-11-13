@@ -21,4 +21,19 @@ router.get("/", (req, res) => {
     }
 });
 
+router.post("/createProject", (req, res) => {
+    if (req.isAuthenticated()){
+        const name = req.body.name;
+        const description = req.body.description;
+
+        req.db.createProject(req.user.email, name, description).then(project => {
+            req.db.giveProjectAccess(project.id, req.user.email).then(() => {
+                res.redirect(`/project/${project.id}`);
+            });
+        });
+    }else{
+        res.sendStatus(403);
+    }
+});
+
 export default router;
