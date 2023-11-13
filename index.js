@@ -1,3 +1,4 @@
+//Public imports (npm)
 import "dotenv/config";
 import express from "express";
 import bodyParser from "body-parser";
@@ -6,32 +7,46 @@ import passport from "passport";
 import LocalStrategy from "passport-local";
 import bcrypt from "bcrypt";
 
+//Local imports
 import { MongoDatabase } from "./data/mongo_database.js";
 import { DataManager } from "./data/data_manager.js";
+import __dirname from "./__dirname.js";
 
-import {dirname} from "path";
-import { fileURLToPath } from "url";
-const __dirname = dirname(fileURLToPath(import.meta.url));
+//Routing imports 
+import homeRoutes from "./routes/home.js";
+import projectRoutes from "./routes/project.js";
+import loginRoutes from "./routes/login.js"
+import signupRoutes from "./routes/signup.js"
 
 const port = 3000;
-const saltRounds = 10;
-
 const app = express();
 
 let database = new MongoDatabase();
 let dataManager = new DataManager(database);
 await dataManager.initDb(process.env.MONGO_URL);
 
+//Custom middleware that adds the data manager object to the request object. This allows the database to be easily used with express routing
+app.use((req, res, next) => {
+    req.db = dataManager;
+    next();
+});
+
+//Set the static (public) folder for ejs and setup body parser
 app.use(express.static("static"));
 app.use(bodyParser.urlencoded({extended: true}));
+
+//Session and cookie setup
 app.use(session({
     secret: process.env.SESSION_KEY,
     resave: false,
     saveUninitialized: false
 }));
+
+//Passport setup
 app.use(passport.initialize());
 app.use(passport.session());
 
+//Passport strategy
 passport.use(new LocalStrategy(async (username, password, cb) => {
     const user = await dataManager.getUser(username);
 
@@ -48,73 +63,28 @@ passport.use(new LocalStrategy(async (username, password, cb) => {
     });
 }));
 
+//Passport serialization and deserilization
 passport.serializeUser((user, cb) => {
     cb(null, {
         email: user.username
     });
 });
-
 passport.deserializeUser((user, cb) => {
     cb(null, user);
 });
 
-app.get("/", async (req, res) => {
+//Routing
+app.use("/home", homeRoutes);
+app.use("/project", projectRoutes);
+app.use("/login", loginRoutes);
+app.use("/signup", signupRoutes);
+
+//Index route
+app.get("/", (req, res) => {
     res.render(__dirname + "/views/index.ejs");
 });
 
-app.get("/login", (req, res) => {
-    if (req.isAuthenticated())
-        res.redirect("/");
-    else
-        res.render(__dirname + "/views/login.ejs");
-});
-
-app.post("/login", passport.authenticate("local", {
-    successRedirect: "/home",
-    failureRedirect: "/login",
-    failureMessage: true
-}));
-
-app.get("/signup", (req, res) => {
-    if (req.isAuthenticated()){
-        return res.redirect("/");
-    }
-
-    res.render(__dirname + "/views/signup.ejs");
-});
-
-//Route for when the user posts their sign up info
-app.post("/signup", async (req, res) => {
-    const username = req.body.username;
-    const password = req.body.password;
-
-    //Validate username and password here
-
-    //Validate that the user does not exist yet. If they do, redirect back to the signup page with the email currently in use
-    if (await dataManager.getUser(username) != null){
-        res.render(__dirname + "/views/signup.ejs", {email: username});
-    } else {
-        //Create the new user.
-        //Begin by hashing their password
-        bcrypt.hash(password, saltRounds, (err, hash) => {
-            //Create the user in the database with the given hash
-            dataManager.createNewUser(username, hash).then(user => {
-                //If the user is succesfully created, log them into the current passport session and redirect them to the next page
-                if (user != null){
-                    req.login(user, err => {
-                        if (err){
-                            return res.redirect("/signup");
-                        } else {
-                            return res.redirect("/home");
-                        }
-                    });
-                }
-            });
-        });
-    }
-
-});
-
+//Log the user out
 app.get("/logout", (req, res) => {
     if (req.isAuthenticated()){
         req.logOut(err => {
@@ -124,138 +94,7 @@ app.get("/logout", (req, res) => {
     }
 });
 
-app.get("/home", (req, res) => {
-    if (req.isAuthenticated()){
-        dataManager.getProjects(req.user.email).then(projects => {
-            const ownerProjects = projects.filter(project => project.ownerUsername === req.user.email);
-            const collabProjects = projects.filter(project => project.ownerUsername !== req.user.email);
-
-            res.render(__dirname + "/views/home.ejs", {
-                username: req.user.email, 
-                ownerProjects: ownerProjects,
-                collabProjects: collabProjects
-            });
-        });
-    } else {
-        res.redirect("/login");
-    }
-});
-
-app.get("/project/:id", async (req, res) => {
-    if (req.isAuthenticated()){
-
-        try{
-            const project = await dataManager.getProject(req.params.id);
-            const bugs = await dataManager.getBugs(project.id);
-
-            res.render(__dirname + "/views/project.ejs", {username: req.user.email, project: project, bugs: bugs, archivePage: false});
-        } catch (error){
-            console.log(error.message);
-            res.status(404).render(__dirname + "/views/not-found-404.ejs");
-        }
-
-    } else {
-        res.redirect("/login");
-    }
-});
-
-app.post("/project/:id/archive", async (req, res) => {
-    if (req.isAuthenticated()){
-
-        const projectId = req.params.id;
-        const bugId = req.body.id;
-
-        try{
-            await dataManager.archiveBug(bugId);
-
-            res.sendStatus(200);
-        }
-        catch (error){
-            console.log(error.message);
-            res.sendStatus(404);
-        }
-    } else {
-        res.redirect("/login");
-    }
-});
-
-app.get("/project/:id/archive", async (req, res) => {
-    if (req.isAuthenticated()){
-
-        try{
-            const project = await dataManager.getProject(req.params.id);
-            const bugs = await dataManager.getArchivedBugs(project.id);
-
-            res.render(__dirname + "/views/project.ejs", {username: req.user.email, project: project, bugs: bugs, archivePage: true});
-        } catch (error){
-            console.log(error.message);
-            res.status(404).render(__dirname + "/views/not-found-404.ejs");
-        }
-    } else {
-        res.redirect("/login");
-    }
-});
-
-app.post("/project/:id/restore", async (req, res) => {
-    if (req.isAuthenticated()){
-
-        const projectId = req.params.id;
-        const bugId = req.body.id;
-
-        try{
-            await dataManager.unarchiveBug(bugId);
-
-            res.sendStatus(200);
-        }
-        catch (error){
-            console.log(error.message);
-            res.sendStatus(404);
-        }
-
-    } else {
-        res.redirect("/login");
-    }
-});
-
-app.post("/project/:id/delete", async (req, res) => {
-    if (req.isAuthenticated()){
-
-        const bugId = req.body.id;
-
-        try{
-            await dataManager.deleteBug(bugId);
-
-            res.sendStatus(200);
-        } catch (error){
-            console.log(error.message);
-            res.sendStatus(404);
-        }
-
-    } else {
-        res.redirect("/login");
-    }
-});
-
-app.post("/project/:id/new", async (req, res) => {
-    if (req.isAuthenticated()){
-
-        const projectId = req.params.id;
-        const dataModel = {
-            level: Number.parseInt(req.body.level),
-            name: req.body.name,
-            description: req.body.description
-        }
-        //TODO: request validation
-        await dataManager.createBug(projectId, dataModel.name, dataModel.description, dataModel.level);
-
-        res.redirect("/project/" + projectId);
-
-    } else {
-        res.redirect("/login");
-    }
-});
-
+//Run the application
 app.listen(port, () => {
     console.log("App running on port " + port);
-    console.log("Dev project running on http://localhost:3000/project/6541eaa9e357f47d45b32a4c");
 });
