@@ -59,20 +59,7 @@ passport.deserializeUser((user, cb) => {
 });
 
 app.get("/", async (req, res) => {
-    if (req.isAuthenticated()){
-        dataManager.getProjects(req.user.email).then(projects => {
-            const ownerProjects = projects.filter(project => project.ownerUsername === req.user.email);
-            const collabProjects = projects.filter(project => project.ownerUsername !== req.user.email);
-
-            res.render(__dirname + "/views/index.ejs", {
-                username: req.user.email, 
-                ownerProjects: ownerProjects,
-                collabProjects: collabProjects
-            });
-        });
-    } else {
-        res.render(__dirname + "/views/index.ejs");
-    }
+    res.render(__dirname + "/views/index.ejs");
 });
 
 app.get("/login", (req, res) => {
@@ -83,7 +70,7 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", passport.authenticate("local", {
-    successRedirect: "/",
+    successRedirect: "/home",
     failureRedirect: "/login",
     failureMessage: true
 }));
@@ -118,7 +105,7 @@ app.post("/signup", async (req, res) => {
                         if (err){
                             return res.redirect("/signup");
                         } else {
-                            return res.redirect("/");
+                            return res.redirect("/home");
                         }
                     });
                 }
@@ -137,84 +124,135 @@ app.get("/logout", (req, res) => {
     }
 });
 
-app.get("/project/:id", async (req, res) => {
-    try{
-        const project = await dataManager.getProject(req.params.id);
-        const bugs = await dataManager.getBugs(project.id);
+app.get("/home", (req, res) => {
+    if (req.isAuthenticated()){
+        dataManager.getProjects(req.user.email).then(projects => {
+            const ownerProjects = projects.filter(project => project.ownerUsername === req.user.email);
+            const collabProjects = projects.filter(project => project.ownerUsername !== req.user.email);
 
-        res.render(__dirname + "/views/project.ejs", {project: project, bugs: bugs, archivePage: false});
-    } catch (error){
-        console.log(error.message);
-        res.status(404).render(__dirname + "/views/not-found-404.ejs");
+            res.render(__dirname + "/views/home.ejs", {
+                username: req.user.email, 
+                ownerProjects: ownerProjects,
+                collabProjects: collabProjects
+            });
+        });
+    } else {
+        res.redirect("/login");
+    }
+});
+
+app.get("/project/:id", async (req, res) => {
+    if (req.isAuthenticated()){
+
+        try{
+            const project = await dataManager.getProject(req.params.id);
+            const bugs = await dataManager.getBugs(project.id);
+
+            res.render(__dirname + "/views/project.ejs", {username: req.user.email, project: project, bugs: bugs, archivePage: false});
+        } catch (error){
+            console.log(error.message);
+            res.status(404).render(__dirname + "/views/not-found-404.ejs");
+        }
+
+    } else {
+        res.redirect("/login");
     }
 });
 
 app.post("/project/:id/archive", async (req, res) => {
-    const projectId = req.params.id;
-    const bugId = req.body.id;
+    if (req.isAuthenticated()){
 
-    try{
-        await dataManager.archiveBug(bugId);
+        const projectId = req.params.id;
+        const bugId = req.body.id;
 
-        res.sendStatus(200);
-    }
-    catch (error){
-        console.log(error.message);
-        res.sendStatus(404);
+        try{
+            await dataManager.archiveBug(bugId);
+
+            res.sendStatus(200);
+        }
+        catch (error){
+            console.log(error.message);
+            res.sendStatus(404);
+        }
+    } else {
+        res.redirect("/login");
     }
 });
 
 app.get("/project/:id/archive", async (req, res) => {
-    try{
-        const project = await dataManager.getProject(req.params.id);
-        const bugs = await dataManager.getArchivedBugs(project.id);
+    if (req.isAuthenticated()){
 
-        res.render(__dirname + "/views/project.ejs", {project: project, bugs: bugs, archivePage: true});
-    } catch (error){
-        console.log(error.message);
-        res.status(404).render(__dirname + "/views/not-found-404.ejs");
+        try{
+            const project = await dataManager.getProject(req.params.id);
+            const bugs = await dataManager.getArchivedBugs(project.id);
+
+            res.render(__dirname + "/views/project.ejs", {username: req.user.email, project: project, bugs: bugs, archivePage: true});
+        } catch (error){
+            console.log(error.message);
+            res.status(404).render(__dirname + "/views/not-found-404.ejs");
+        }
+    } else {
+        res.redirect("/login");
     }
 });
 
 app.post("/project/:id/restore", async (req, res) => {
-    const projectId = req.params.id;
-    const bugId = req.body.id;
+    if (req.isAuthenticated()){
 
-    try{
-        await dataManager.unarchiveBug(bugId);
+        const projectId = req.params.id;
+        const bugId = req.body.id;
 
-        res.sendStatus(200);
-    }
-    catch (error){
-        console.log(error.message);
-        res.sendStatus(404);
+        try{
+            await dataManager.unarchiveBug(bugId);
+
+            res.sendStatus(200);
+        }
+        catch (error){
+            console.log(error.message);
+            res.sendStatus(404);
+        }
+
+    } else {
+        res.redirect("/login");
     }
 });
 
 app.post("/project/:id/delete", async (req, res) => {
-    const bugId = req.body.id;
+    if (req.isAuthenticated()){
 
-    try{
-        await dataManager.deleteBug(bugId);
+        const bugId = req.body.id;
 
-        res.sendStatus(200);
-    } catch (error){
-        console.log(error.message);
-        res.sendStatus(404);
+        try{
+            await dataManager.deleteBug(bugId);
+
+            res.sendStatus(200);
+        } catch (error){
+            console.log(error.message);
+            res.sendStatus(404);
+        }
+
+    } else {
+        res.redirect("/login");
     }
 });
 
 app.post("/project/:id/new", async (req, res) => {
-    const projectId = req.params.id;
-    const dataModel = {
-        level: Number.parseInt(req.body.level),
-        name: req.body.name,
-        description: req.body.description
-    }
-    //TODO: request validation
-    await dataManager.createBug(projectId, dataModel.name, dataModel.description, dataModel.level);
+    if (req.isAuthenticated()){
 
-    res.redirect("/project/" + projectId);
+        const projectId = req.params.id;
+        const dataModel = {
+            level: Number.parseInt(req.body.level),
+            name: req.body.name,
+            description: req.body.description
+        }
+        //TODO: request validation
+        await dataManager.createBug(projectId, dataModel.name, dataModel.description, dataModel.level);
+
+        res.redirect("/project/" + projectId);
+
+    } else {
+        res.redirect("/login");
+    }
 });
 
 app.listen(port, () => {

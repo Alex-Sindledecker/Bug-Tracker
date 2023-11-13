@@ -52,15 +52,39 @@ hr{
 }
 
 .huge-text{
-    font-size: 4em;
+    
 }
 
 .big-text{
-    font-size: 3rem;
+    
 }
 
 .header{
+    display: flex;
+    background-color: var(--color1);
+    padding: 1em;
+    color: white;
+    gap: 1em;
+    align-items: baseline;
+}
+
+.header-link{
+    text-decoration: none;
     
+    background-image: linear-gradient(var(--color3) 0 0);
+    background-position: bottom center; /*Adjust the background-position to move the line*/
+    background-size: 0% 2px; /*Adjust the background size to control length and height*/
+    background-repeat: no-repeat;
+    padding-bottom: 4px; /* this can also control the position */
+    transition: 0.18s;
+}
+
+.header-link:hover{
+    background-size: 100% 2px; /*Adjust the background size to control length and height*/
+}
+
+.header-link-wide{
+    flex: 1;
 }
 
 .main-content{
@@ -90,7 +114,7 @@ hr{
     background: none;
     color: var(--font-color);
     border: none;
-    font-size: 1em;
+    
     text-decoration: underline;
 }
 
@@ -104,8 +128,7 @@ hr{
     padding: 2em;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: max-content;
-    column-gap: 2em;
-    row-gap: 4em;
+    gap: 2em 2em;
 }
 
 .bug-card{
@@ -123,7 +146,7 @@ hr{
 }
 
 .button-card > svg{
-    scale: 1.3;
+    
 }
 
 .button-card:hover{
@@ -131,7 +154,7 @@ hr{
 }
 
 .bug-card-title{
-    font-size: 1.5em;
+    
     margin-bottom: 0.5em;
 }
 
@@ -142,16 +165,14 @@ hr{
 }
 
 .footer{
-    padding: 2em;
+    padding: 1em;
 
     flex-shrink: 0;
     display: flex;
     justify-content: space-between;
 
-    background-color: var(--color1);
+    background-color: var(--color2);
     color: white;
-
-    font-size: 0.9em;
 }
 
 .footer a{
@@ -236,7 +257,7 @@ hr{
 }
 
 .site-overlay > h3{
-    font-size: 1.5em;
+    
     color: var(--font-color);
 }
 
@@ -245,7 +266,7 @@ hr{
 }
 
 .site-overlay > input,textarea{
-    font-size: 1em;
+    
     font-family: sans-serif;
     border: none;
     padding: 0.8em;
@@ -271,7 +292,7 @@ hr{
 
 .overlay-button{
     padding: 1em;
-    font-size: 1.2em;
+    
     border-radius: 10px;
     border: none;
     background-color: var(--color1);
@@ -287,7 +308,7 @@ hr{
     position: absolute;
     left: 0;
     top: 0;
-    scale: 2.3;
+    
     margin: 20px;
     color:var(--font-color)
 }
@@ -304,7 +325,7 @@ hr{
 
 .level-selection{
     color: #363436;
-    font-size: 1.2em;
+    
     padding: 1em;
     flex: 1;
     text-align: center;
@@ -324,7 +345,7 @@ hr{
 }
 
 .other-login-options > a{
-    scale: 1.5;
+    
 }
 
 .warning-text{
@@ -351,6 +372,10 @@ hr{
     grid-template-rows: max-content;
     column-gap: 2em;
     row-gap: 4em;
+}
+
+.project-grid > a{
+    text-decoration: none;
 }
 
 .hidden{

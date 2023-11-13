@@ -1,0 +1,11 @@
+<header class="header">
+    <h3 class="header-link-wide"><a class="header-link" href="/">Bug Tracker</a></h3>
+    <% if (locals.username) { %>
+        <a class="header-link" href="/home">Home</a>
+        <a class="header-link" href="/profile">Profile</a>
+        <a class="header-link" href="/logout">Logout</a>
+    <% } else { %>
+        <a class="header-link" href="/login">Login</a>/
+        <a class="header-link" href="/signup">Sign up</a>
+    <% } %>
+</header>
