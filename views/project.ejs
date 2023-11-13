@@ -9,7 +9,7 @@
     </head>
     <body>
 
-        <%- include("partials/header.ejs") %>
+        <%- include("partials/header.ejs") %>   
         <% if (locals.bugs && locals.project && locals.archivePage !== undefined) { %>
             <div class="main-content">
                 <div class="project-banner">
@@ -17,46 +17,48 @@
                     <div>
                         <a class="project-banner-button" href="/project/<%=project.id%>/">Project Home</a>&emsp;
                         <a class="project-banner-button" href="/project/<%=project.id%>/archive/">Archive</a>&emsp;
-                        <button class="project-banner-button">Add People</button>
+                        <button class="project-banner-button">Share</button>
                     </div>
                 </div>
+                <button class="" onclick="sortBugsLowHigh()">Sort Accending</button>
+                <button class="" onclick="sortBugsHighLow()">Sort Decending</button>
                 <div class="bug-grid">
-                    <% bugs.forEach(bug => { %>
-                        <div class="bug-card">
-                            <% if (bug.archived === false) { %>
-                                <div class="bug-level-<%=bug.level%>"></div>
-                            <% } else { %>
-                                <div class="bug-level-archive"></div>
-                            <% } %>
-                            <div class="card-content">
-                                <h3 class="bug-card-title">
-                                    <%= bug.name %>
-                                    
-                                    <% if (bug.archived === false) { %>
-                                        <button name="archive-<%=bug.id%>" type="submit" class="card-button card-button-green">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2-circle" viewBox="0 0 16 16">
-                                                <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0z"/>
-                                                <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"/>
-                                            </svg>
-                                        </button>
-                                    <% } else { %>
-                                        <button name="restore-<%=bug.id%>" type="submit" class="card-button card-button-green">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
-                                                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
-                                                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
-                                            </svg>
-                                        </button>
-                                        <button name="delete-<%=bug.id%>" type="submit" class="card-button card-button-red">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
-                                                <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
-                                              </svg>
-                                        </button>
-                                    <% } %>
-                                </h3>
-                                <p><%= bug.description %></p>
+                        <% bugs.forEach(bug => { %>
+                            <div class="bug-card">
+                                <% if (bug.archived === false) { %>
+                                    <div class="bug-level-<%=bug.level%>"></div>
+                                <% } else { %>
+                                    <div class="bug-level-archive"></div>
+                                <% } %>
+                                <div class="card-content">
+                                    <h3 class="bug-card-title">
+                                        <%= bug.name %>
+                                        
+                                        <% if (bug.archived === false) { %>
+                                            <button name="archive-<%=bug.id%>" type="submit" class="card-button card-button-green">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2-circle" viewBox="0 0 16 16">
+                                                    <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0z"/>
+                                                    <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"/>
+                                                </svg>
+                                            </button>
+                                        <% } else { %>
+                                            <button name="restore-<%=bug.id%>" type="submit" class="card-button card-button-green">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                                                    <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                                                    <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                                                </svg>
+                                            </button>
+                                            <button name="delete-<%=bug.id%>" type="submit" class="card-button card-button-red">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                                                    <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
+                                                  </svg>
+                                            </button>
+                                        <% } %>
+                                    </h3>
+                                    <p><%= bug.description %></p>
+                                </div>
                             </div>
-                        </div>
-                    <% }); %>
+                        <% }); %>
                     <% if (archivePage === false) { %>
                         <div class="bug-card flex-center-all button-card add-bug-card">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
@@ -90,6 +92,20 @@
                 </button>
             </form>
 
+            <form id="share-project-overlay" class="site-overlay hidden" method="post" action="/project/<%=project.id%>/share">
+                <svg class="close-overlay-button" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                </svg>
+                <h3>Share</h3>
+                <input name="email" type="email" placeholder="Email Address" required/>
+                <button class="overlay-button" type="submit">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                    </svg>
+                </button>
+            </form>
+
         <% } else { %>
             <div class="main-content flex-center-all medium-gap">
                 <h2 class="big-text">Something went wrong :/</h2>
@@ -99,6 +115,33 @@
 
         <%- include ("partials/footer.ejs") %>
 
+        <script>
+            function sortBugsLowHigh(){
+                let result = $(".bug-grid > .bug-card").sort((a, b) => {
+                    try{
+                        const v1 = $(a).find("[class^=bug-level-]").attr("class").split('-')[2];
+                        const v2 = $(b).find("[class^=bug-level-]").attr("class").split('-')[2];
+                        
+                        return v1 < v2 ? -1 : (v1 == v2 ? 0 : 1);
+                    } catch { return 1; }
+                });
+                $(".bug-grid").html(result);
+            }
+
+            function sortBugsHighLow(){
+                let result = $(".bug-grid > .bug-card").sort((a, b) => {
+                    try{
+                        const v1 = $(a).find("[class^=bug-level-]").attr("class").split('-')[2];
+                        const v2 = $(b).find("[class^=bug-level-]").attr("class").split('-')[2];
+                        
+                        return v1 < v2 ? 1 : (v1 == v2 ? 0 : -1);
+                    } catch { return 1; }
+                });
+                $(".bug-grid").html(result);
+            }
+
+            sortBugsHighLow();
+        </script>
         <script src="/js/app.js"></script>
         <script src="/js/projects.js"></script>
     </body>
