@@ -28,7 +28,8 @@ export class MongoDatabase extends Database{
     }
 
     async init(url){
-        await mongoose.connect(url).then(() => console.log("Succesfully connected to the mongo database!\n"));
+        await mongoose.connect(url);
+        console.log("Succesfully connected to the mongo database!\n");
 
         this._BugModel = mongoose.model("bug", this._bugSchema);
         this._ProjectModel = mongoose.model("project", this._projectSchema);
@@ -46,9 +47,10 @@ export class MongoDatabase extends Database{
             projects: []
         });
 
-        await user.save();
-
-        return {username: username, password: password};
+        const u = await user.save();
+        if (u === user)
+            return {username: u.username, password: u.password};
+        return null;
     }
 
     async getUser(username){
