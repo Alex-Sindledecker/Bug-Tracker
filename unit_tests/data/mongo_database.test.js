@@ -12,9 +12,20 @@ beforeAll(async () => {
 //Test user creation
 test(`Creates a user in ${process.env.TEST_DB_URL}  with username 'DEV_USER_CREATE' and passowrd '123'`, (done) => {
     db.addUser("DEV_USER_CREATE", "123").then(user => {
-        console.log("User created");
         expect(user).toStrictEqual({username: "DEV_USER_CREATE", password: "123"});
 
+        done();
+    });
+});
+
+//Test project creation
+test(`Creates a project in ${process.env.TEST_DB_URL} with username: 'username', name: 'DEV_PROJECT_CREATE', and description: 'description'`, (done) => {
+    db.addProject("username", "DEV_PROJECT_CREATE", "description").then(project => {
+        expect(project).toMatchObject({
+            name: "DEV_PROJECT_CREATE",
+            description: "description",
+            ownerUsername: "username"
+        });
         done();
     });
 });
