@@ -30,6 +30,33 @@ test(`Creates a project in ${process.env.TEST_DB_URL} with username: 'username',
     });
 });
 
+//Test bug creation
+test(`Creates a bug in ${process.env.TEST_DB_URL} with projectId: '000000000000000000000000', level: '2', name: 'DEV_BUG_CREATE', and description: 'description'`, (done) => {
+    db.addBug("000000000000000000000000", 2, "DEV_BUG_CREATE", "description").then(bug => {
+        expect(bug).toMatchObject({
+            projectId: "000000000000000000000000",
+            level: 2,
+            name: "DEV_BUG_CREATE",
+            description: "description"
+        });
+        done();
+    })
+});
+
+//Test user retrieval
+test(`Retrieves a user with username: 'DEV_USERNAME_GET', password: 'password', projects: '[]'`, (done) => {
+    (new db._UserModel({username: 'DEV_USERNAME_GET', password: 'password', projects: []})).save().then((createdModel => {
+        db.getUser("DEV_USERNAME_GET").then(user => {
+            expect(user).toMatchObject({
+                username: "DEV_USERNAME_GET", 
+                password: "password",
+                projects: []
+            });
+            done();
+        })
+    }));
+});
+
 //Wipe data from database and disconnect
 afterAll(async () => {
     await db._UserModel.deleteMany({});

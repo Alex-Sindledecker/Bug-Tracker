@@ -37,7 +37,7 @@ export class MongoDatabase extends Database{
     }
 
     async disconnect(){
-        await mongoose.disconnect();
+        return await mongoose.disconnect();
     }
 
     async addUser(username, password){
@@ -88,8 +88,8 @@ export class MongoDatabase extends Database{
             archived: false
         });
 
-        await bug.save();
-        return this.__toRawBug(bug.toObject());
+        const b = await bug.save();
+        return this.__toRawBug(b.toObject());
     }
 
     async getProject(id){
