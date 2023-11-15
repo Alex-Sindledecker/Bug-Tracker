@@ -12,19 +12,25 @@ export class MongoDatabase extends Database{
             name: String,
             description: String,
             archived: Boolean
-        }
+        };
 
         this._projectSchema = {
             ownerUsername: String,
             name: String,
             description: String
-        }
+        };
 
         this._userSchema = {
             username: String,
             password: String,
             projects: [Schema.ObjectId]
-        }
+        };
+
+        this._projectShareSchema = {
+            projectId: Schema.ObjectId,
+            targetUsername: String,
+            code: String
+        };
     }
 
     async init(url){
@@ -34,6 +40,7 @@ export class MongoDatabase extends Database{
         this._BugModel = mongoose.model("bug", this._bugSchema);
         this._ProjectModel = mongoose.model("project", this._projectSchema);
         this._UserModel = mongoose.model("user", this._userSchema);
+        this._ProjectShareModel = mongoose.model("project_share", this._projectShareSchema);
     }
 
     async disconnect(){
@@ -99,11 +106,39 @@ export class MongoDatabase extends Database{
         return this.__toRawProject(project);
     }
 
+    async shareProject(id, targetUsername, code){
+        let share = new this._ProjectShareModel({
+            projectId: new Types.ObjectId(id),
+            targetUsername: targetUsername,
+            code: code
+        });
+
+        const s = await share.save();
+
+        if (s === share)
+            return {projectId: s.projectId.toString(), targetUsername: s.targetUsername, code: s.code};
+        return null;
+    }
+
     async getProjects(filter){
         let projects = [];
 
         for await (const model of this._ProjectModel.find(this.__convertFilter(filter))){
             projects.push(await this.__toRawProject(model));
+        }
+
+        return projects;
+    }
+
+    async getSharedProjects(username){
+        let projects = [];
+
+        for await (const model of this._ProjectShareModel.find({targetUsername: username})){
+            projects.push({
+                projectId: await model.projectId.toString(),
+                targetUsername: await model.targetUsername,
+                code: await model.code
+            });
         }
 
         return projects;
