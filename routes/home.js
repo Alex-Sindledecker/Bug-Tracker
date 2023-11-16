@@ -10,10 +10,14 @@ router.get("/", (req, res) => {
             const ownerProjects = projects.filter(project => project.ownerUsername === req.user.email);
             const collabProjects = projects.filter(project => project.ownerUsername !== req.user.email);
 
-            res.render(__dirname + "/views/home.ejs", {
-                username: req.user.email, 
-                ownerProjects: ownerProjects,
-                collabProjects: collabProjects
+            req.db.getPendingProjects(req.user.email).then(pendingProjects => {
+                console.log(pendingProjects);
+                res.render(__dirname + "/views/home.ejs", {
+                    username: req.user.email, 
+                    ownerProjects: ownerProjects,
+                    collabProjects: collabProjects,
+                    pendingProjects: pendingProjects
+                });
             });
         });
     } else {

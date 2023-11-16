@@ -32,25 +32,44 @@ test(`Creates a new project share object in ${process.env.TEST_DB_URL} with proj
 });
 
 //Test get shared projects
-test("creates two projectShares and run getSharedProjects to get them", (done) => {
-    db.shareProject("000000000000000000000000", "SHARE_USERNAME_DEV", "0000").then(() => {
-        db.shareProject("111111111111111111111111", "SHARE_USERNAME_DEV", "1111").then(() => {
-            db.getSharedProjects("SHARE_USERNAME_DEV").then(projects => {
-                expect(projects).toEqual([
-                    {
-                        projectId: "000000000000000000000000",
-                        targetUsername: "SHARE_USERNAME_DEV",
-                        code: "0000"
-                    },
-                    {
-                        projectId: "111111111111111111111111",
-                        targetUsername: "SHARE_USERNAME_DEV",
-                        code: "1111"
-                    }
-                ]);
-                done();
-            });
-        });
+test("creates two projectShares and run getSharedProjects to get them", async () => {
+    let p1 = new db._ProjectModel({
+        ownerUsername: "SHARE_PROJECT_NAME",
+        name: "SHARE_PROJECT_DEV1",
+        description: "description"
+    });
+    await p1.save();
+
+    let p2 = new db._ProjectModel({
+        ownerUsername: "SHARE_PROJECT_NAME",
+        name: "SHARE_PROJECT_DEV2",
+        description: "description"
+    });
+    await p2.save();
+
+    const p1Id = await p1._id.toString();
+    const p2Id = await p2._id.toString();
+
+    await db.shareProject(p1Id, "SHARE_USERNAME_DEV", "0000");
+    await db.shareProject(p2Id, "SHARE_USERNAME_DEV", "1111");
+
+    db.getSharedProjects("SHARE_USERNAME_DEV").then(projects => {
+        expect(projects).toEqual([
+            {
+                id: p1Id,
+                name: "SHARE_PROJECT_DEV1",
+                description: "description",
+                ownerUsername: "SHARE_PROJECT_NAME",
+                code: "0000"
+            },
+            {
+                id: p2Id,
+                name: "SHARE_PROJECT_DEV2",
+                description: "description",
+                ownerUsername: "SHARE_PROJECT_NAME",
+                code: "1111"
+            }
+        ]);
     });
 });
 

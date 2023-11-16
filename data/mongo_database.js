@@ -131,17 +131,27 @@ export class MongoDatabase extends Database{
     }
 
     async getSharedProjects(username){
-        let projects = [];
+        let projectIds = [];
+        let projectCodes = [];
+        let result = [];
 
         for await (const model of this._ProjectShareModel.find({targetUsername: username})){
-            projects.push({
-                projectId: await model.projectId.toString(),
-                targetUsername: await model.targetUsername,
-                code: await model.code
-            });
+            projectIds.push(await model.projectId);
+            projectCodes.push(await model.code);
         }
 
-        return projects;
+        const projects = await this._ProjectModel.find({
+            _id: {
+                $in: projectIds
+            }
+        });
+
+        for await (const project of projects){
+            result.push(await this.__toRawProject(project));
+            result[result.length - 1]["code"] = projectCodes[result.length - 1];
+        }
+
+        return result;
     }
 
     async getBug(id){

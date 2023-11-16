@@ -122,4 +122,28 @@ router.post("/:id/new", async (req, res) => {
     }
 });
 
+router.post("/:id/share", (req, res) => {
+    if (req.isAuthenticated()){
+        const projectId = req.params.id;
+        const targetUsername = req.body.email;
+        
+        //TODO: Verify that target username exists and that the authenticated user is allowed to share this project
+        
+        req.db.shareProject(projectId, targetUsername).then(p => {
+            if (p == null)
+                res.sendStatus(500);
+            else
+                res.sendStatus(200);
+        })
+    }
+});
+
+router.post("/:id/join", (req, res) => {
+
+});
+
+router.post("/:id/decline", (req, res) => {
+    
+})
+
 export default router;
