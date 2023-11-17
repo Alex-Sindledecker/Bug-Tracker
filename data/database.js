@@ -40,8 +40,16 @@ export default class Database{
         throw new Error("Method 'getProject()' must be implemented!");
     }
 
+    shareProject(id, targetUsername, code){
+        throw new Error("Method 'shareProject()' must be implemented!");    
+    }
+
     getProjects(filter){
         throw new Error("Method 'getProjects()' must be implemented!");
+    }
+
+    getSharedProjects(username){
+        throw new Error("Method 'getSharedProjects()' must be implemented!");
     }
 
     getProjects(username){
@@ -70,6 +78,10 @@ export default class Database{
 
     deleteProject(id){
         throw new Error("Method 'deleteProject()' must be implemented");
+    }
+
+    deleteProjectShare(projectId, username){
+        throw new Error("Method 'deleteProjectShare()' must be implemented!");
     }
 }
 

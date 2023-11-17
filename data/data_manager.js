@@ -43,6 +43,10 @@ export class DataManager{
         return this.database.getProject(id);
     }
 
+    async shareProject(projectId, targetUsername){
+        return this.database.shareProject(projectId, targetUsername, "0000");
+    }
+
     //Returns all projects that 'username' is involved in
     async getProjects(username){
         const user = await this.getUser(username);
@@ -51,6 +55,11 @@ export class DataManager{
                 _id: user.projects
             }
         });
+    }
+
+    //Returns all the projects that a user is invited to but has not joined
+    async getPendingProjects(username){
+        return this.database.getSharedProjects(username);
     }
 
     async getBug(id){
@@ -77,6 +86,10 @@ export class DataManager{
 
     async unarchiveBug(id){
         this.database.modifyBug(id, "archived", false);
+    }
+    
+    async deleteProjectInvite(projectId, username){
+        this.database.deleteProjectShare(projectId, username);
     }
 
     async deleteBug(id){

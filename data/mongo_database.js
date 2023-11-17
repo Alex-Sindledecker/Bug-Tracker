@@ -1,6 +1,7 @@
 import mongoose, {Schema, Types} from "mongoose";
 
 import Database from "./database.js";
+import res from "express/lib/response.js";
 
 export class MongoDatabase extends Database{
     constructor(){ 
@@ -12,19 +13,25 @@ export class MongoDatabase extends Database{
             name: String,
             description: String,
             archived: Boolean
-        }
+        };
 
         this._projectSchema = {
             ownerUsername: String,
             name: String,
             description: String
-        }
+        };
 
         this._userSchema = {
             username: String,
             password: String,
             projects: [Schema.ObjectId]
-        }
+        };
+
+        this._projectShareSchema = {
+            projectId: Schema.ObjectId,
+            targetUsername: String,
+            code: String
+        };
     }
 
     async init(url){
@@ -34,6 +41,7 @@ export class MongoDatabase extends Database{
         this._BugModel = mongoose.model("bug", this._bugSchema);
         this._ProjectModel = mongoose.model("project", this._projectSchema);
         this._UserModel = mongoose.model("user", this._userSchema);
+        this._ProjectShareModel = mongoose.model("project_share", this._projectShareSchema);
     }
 
     async disconnect(){
@@ -100,6 +108,20 @@ export class MongoDatabase extends Database{
         return this.__toRawProject(project);
     }
 
+    async shareProject(id, targetUsername, code){
+        let share = new this._ProjectShareModel({
+            projectId: new Types.ObjectId(id),
+            targetUsername: targetUsername,
+            code: code
+        });
+
+        const s = await share.save();
+
+        if (s === share)
+            return {projectId: s.projectId.toString(), targetUsername: s.targetUsername, code: s.code};
+        return null;
+    }
+
     async getProjects(filter){
         let projects = [];
 
@@ -108,6 +130,30 @@ export class MongoDatabase extends Database{
         }
 
         return projects;
+    }
+
+    async getSharedProjects(username){
+        let projectIds = [];
+        let projectCodes = [];
+        let result = [];
+
+        for await (const model of this._ProjectShareModel.find({targetUsername: username})){
+            projectIds.push(await model.projectId);
+            projectCodes.push(await model.code);
+        }
+
+        const projects = await this._ProjectModel.find({
+            _id: {
+                $in: projectIds
+            }
+        });
+
+        for await (const project of projects){
+            result.push(await this.__toRawProject(project));
+            result[result.length - 1]["code"] = projectCodes[result.length - 1];
+        }
+
+        return result;
     }
 
     async getBug(id){
@@ -172,6 +218,12 @@ export class MongoDatabase extends Database{
 
     async deleteProject(id){
         const result = await this._ProjectModel.deleteOne({_id: new Types.ObjectId(id)});
+
+        return result.deletedCount > 0;
+    }
+
+    async deleteProjectShare(projectId, username){
+        const result = await this._ProjectShareModel.deleteOne({projectId: projectId, targetUsername: username});
 
         return result.deletedCount > 0;
     }
