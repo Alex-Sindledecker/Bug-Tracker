@@ -45,7 +45,7 @@ export class MongoDatabase extends Database{
     }
 
     async disconnect(){
-        await mongoose.disconnect();
+        return await mongoose.disconnect();
     }
 
     async addUser(username, password){
@@ -81,9 +81,10 @@ export class MongoDatabase extends Database{
             description: description
         });
 
-        await project.save();
-
-        return this.__toRawProject(project.toObject());
+        const p = await project.save();
+        if (p === project)
+            return this.__toRawProject(p.toObject());
+        return null;
     }
 
     async addBug(projectId, level, name, description){
@@ -95,8 +96,8 @@ export class MongoDatabase extends Database{
             archived: false
         });
 
-        await bug.save();
-        return this.__toRawBug(bug.toObject());
+        const b = await bug.save();
+        return this.__toRawBug(b.toObject());
     }
 
     async getProject(id){
