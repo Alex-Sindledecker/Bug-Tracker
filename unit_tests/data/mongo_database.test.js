@@ -10,7 +10,7 @@ beforeAll(async () => {
 });
 
 //Test user creation
-test(`Creates a user in ${process.env.TEST_DB_URL}  with username 'DEV_USER_CREATE' and passowrd '123'`, (done) => {
+test(`Creates a user with username 'DEV_USER_CREATE' and passowrd '123'`, (done) => {
     db.addUser("DEV_USER_CREATE", "123").then(user => {
         console.log("User created");
         expect(user).toStrictEqual({username: "DEV_USER_CREATE", password: "123"});
@@ -20,7 +20,7 @@ test(`Creates a user in ${process.env.TEST_DB_URL}  with username 'DEV_USER_CREA
 });
 
 //Test share project
-test(`Creates a new project share object in ${process.env.TEST_DB_URL} with project id: '000000000000000000000000', targetUsername: 'TARGET_USERNAME_DEV', and join code: '0000'`, (done) => {
+test(`Creates a new project share object with project id: '000000000000000000000000', targetUsername: 'TARGET_USERNAME_DEV', and join code: '0000'`, (done) => {
     db.shareProject("000000000000000000000000", "TARGET_USERNAME_DEV", "0000").then(share => {
         expect(share).toMatchObject({
             projectId: "000000000000000000000000",
@@ -33,6 +33,7 @@ test(`Creates a new project share object in ${process.env.TEST_DB_URL} with proj
 
 //Test get shared projects
 test("creates two projectShares and run getSharedProjects to get them", async () => {
+    //Create project samples
     let p1 = new db._ProjectModel({
         ownerUsername: "SHARE_PROJECT_NAME",
         name: "SHARE_PROJECT_DEV1",
@@ -47,9 +48,11 @@ test("creates two projectShares and run getSharedProjects to get them", async ()
     });
     await p2.save();
 
+    //Get ids
     const p1Id = await p1._id.toString();
     const p2Id = await p2._id.toString();
 
+    //Create project sharess
     await db.shareProject(p1Id, "SHARE_USERNAME_DEV", "0000");
     await db.shareProject(p2Id, "SHARE_USERNAME_DEV", "1111");
 
@@ -71,6 +74,16 @@ test("creates two projectShares and run getSharedProjects to get them", async ()
             }
         ]);
     });
+});
+
+test("Creates a project share and deletes it. Expected result is true", (done) => {
+    db.shareProject("000000000000000000000000", "PROJECT_SHARE_DELETE_NAME", "0000").then(share => {
+        db.deleteProjectShare(share.projectId, share.targetUsername).then(result => {
+            expect(result).toBe(true);
+            done();
+        });
+    });
+
 });
 
 //Wipe data from database and disconnect

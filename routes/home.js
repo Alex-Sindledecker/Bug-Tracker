@@ -11,7 +11,6 @@ router.get("/", (req, res) => {
             const collabProjects = projects.filter(project => project.ownerUsername !== req.user.email);
 
             req.db.getPendingProjects(req.user.email).then(pendingProjects => {
-                console.log(pendingProjects);
                 res.render(__dirname + "/views/home.ejs", {
                     username: req.user.email, 
                     ownerProjects: ownerProjects,

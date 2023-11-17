@@ -139,11 +139,30 @@ router.post("/:id/share", (req, res) => {
 });
 
 router.post("/:id/join", (req, res) => {
+    if (req.isAuthenticated()){
+        const username = req.user.email;
+        const projectId = req.params.id;
 
+        req.db.giveProjectAccess(projectId, username);
+        req.db.deleteProjectInvite(projectId, username);
+
+        res.redirect(`/project/${projectId}/`);
+    }else{
+        res.sendStatus(403);
+    }
 });
 
 router.post("/:id/decline", (req, res) => {
-    
+    if (req.isAuthenticated()){
+        const username = req.user.email;
+        const projectId = req.params.id;
+
+        req.db.deleteProjectInvite(projectId, username);
+
+        res.redirect("/home");
+    }else{
+        res.sendStatus(403);
+    }
 })
 
 export default router;

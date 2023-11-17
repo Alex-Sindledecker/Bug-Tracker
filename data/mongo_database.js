@@ -1,6 +1,7 @@
 import mongoose, {Schema, Types} from "mongoose";
 
 import Database from "./database.js";
+import res from "express/lib/response.js";
 
 export class MongoDatabase extends Database{
     constructor(){ 
@@ -216,6 +217,12 @@ export class MongoDatabase extends Database{
 
     async deleteProject(id){
         const result = await this._ProjectModel.deleteOne({_id: new Types.ObjectId(id)});
+
+        return result.deletedCount > 0;
+    }
+
+    async deleteProjectShare(projectId, username){
+        const result = await this._ProjectShareModel.deleteOne({projectId: projectId, targetUsername: username});
 
         return result.deletedCount > 0;
     }

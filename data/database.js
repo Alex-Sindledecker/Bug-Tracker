@@ -79,6 +79,10 @@ export default class Database{
     deleteProject(id){
         throw new Error("Method 'deleteProject()' must be implemented");
     }
+
+    deleteProjectShare(projectId, username){
+        throw new Error("Method 'deleteProjectShare()' must be implemented!");
+    }
 }
 
 export class SQLDatabase extends Database{

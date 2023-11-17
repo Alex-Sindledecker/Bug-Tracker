@@ -87,6 +87,10 @@ export class DataManager{
     async unarchiveBug(id){
         this.database.modifyBug(id, "archived", false);
     }
+    
+    async deleteProjectInvite(projectId, username){
+        this.database.deleteProjectShare(projectId, username);
+    }
 
     async deleteBug(id){
         return this.database.deleteBug(id);
