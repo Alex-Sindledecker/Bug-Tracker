@@ -1,4 +1,5 @@
 import express from "express";
+import { getDB } from "../database.js";
 import __dirname from "../__dirname.js";
 
 const router = express.Router();
@@ -7,8 +8,10 @@ const router = express.Router();
 router.get("/:id", async (req, res) => {
     if (req.isAuthenticated()){
         try{
-            const project = await req.db.getProject(req.params.id);
-            const bugs = await req.db.getBugs(project.id);
+            const db = getDB();
+
+            const project = await db.getProject(req.params.id);
+            const bugs = await db.getBugs(project.id);
 
             res.render(__dirname + "/views/project.ejs", {username: req.user.email, project: project, bugs: bugs, archivePage: false});
         } catch (error){
@@ -24,12 +27,13 @@ router.get("/:id", async (req, res) => {
 //https://localhost:3000/project/id/archive
 router.post("/:id/archive", async (req, res) => {
     if (req.isAuthenticated()){
+        const db = getDB();
 
         const projectId = req.params.id;
         const bugId = req.body.id;
 
         try{
-            await req.db.archiveBug(bugId);
+            await db.archiveBug(bugId);
 
             res.sendStatus(200);
         }
@@ -45,10 +49,11 @@ router.post("/:id/archive", async (req, res) => {
 //https://localhost:3000/project/id/archive
 router.get("/:id/archive", async (req, res) => {
     if (req.isAuthenticated()){
+        const db = getDB();
 
         try{
-            const project = await req.db.getProject(req.params.id);
-            const bugs = await req.db.getArchivedBugs(project.id);
+            const project = await db.getProject(req.params.id);
+            const bugs = await db.getArchivedBugs(project.id);
 
             res.render(__dirname + "/views/project.ejs", {username: req.user.email, project: project, bugs: bugs, archivePage: true});
         } catch (error){
@@ -63,12 +68,13 @@ router.get("/:id/archive", async (req, res) => {
 //https://localhost:3000/project/id/restore
 router.post("/:id/restore", async (req, res) => {
     if (req.isAuthenticated()){
+        const db = getDB();
 
         const projectId = req.params.id;
         const bugId = req.body.id;
 
         try{
-            await req.db.unarchiveBug(bugId);
+            await db.unarchiveBug(bugId);
 
             res.sendStatus(200);
         }
@@ -85,11 +91,12 @@ router.post("/:id/restore", async (req, res) => {
 //https://localhost:3000/project/id/delete
 router.post("/:id/delete", async (req, res) => {
     if (req.isAuthenticated()){
+        const db = getDB();
 
         const bugId = req.body.id;
 
         try{
-            await req.db.deleteBug(bugId);
+            await db.deleteBug(bugId);
 
             res.sendStatus(200);
         } catch (error){
@@ -105,6 +112,7 @@ router.post("/:id/delete", async (req, res) => {
 //https://localhost:3000/project/id/new
 router.post("/:id/new", async (req, res) => {
     if (req.isAuthenticated()){
+        const db = getDB();
 
         const projectId = req.params.id;
         const dataModel = {
@@ -113,7 +121,7 @@ router.post("/:id/new", async (req, res) => {
             description: req.body.description
         }
         //TODO: request validation
-        await req.db.createBug(projectId, dataModel.name, dataModel.description, dataModel.level);
+        await db.createBug(projectId, dataModel.name, dataModel.description, dataModel.level);
 
         res.redirect("/project/" + projectId);
 
@@ -124,12 +132,14 @@ router.post("/:id/new", async (req, res) => {
 
 router.post("/:id/share", (req, res) => {
     if (req.isAuthenticated()){
+        const db = getDB();
+
         const projectId = req.params.id;
         const targetUsername = req.body.email;
         
         //TODO: Verify that target username exists and that the authenticated user is allowed to share this project
         
-        req.db.shareProject(projectId, targetUsername).then(p => {
+        db.shareProject(projectId, targetUsername).then(p => {
             if (p == null)
                 res.sendStatus(500);
             else
@@ -140,11 +150,13 @@ router.post("/:id/share", (req, res) => {
 
 router.post("/:id/join", (req, res) => {
     if (req.isAuthenticated()){
+        const db = getDB();
+
         const username = req.user.email;
         const projectId = req.params.id;
 
-        req.db.giveProjectAccess(projectId, username);
-        req.db.deleteProjectInvite(projectId, username);
+        db.giveProjectAccess(projectId, username);
+        db.deleteProjectInvite(projectId, username);
 
         res.redirect(`/project/${projectId}/`);
     }else{
@@ -154,10 +166,12 @@ router.post("/:id/join", (req, res) => {
 
 router.post("/:id/decline", (req, res) => {
     if (req.isAuthenticated()){
+        const db = getDB();
+
         const username = req.user.email;
         const projectId = req.params.id;
 
-        req.db.deleteProjectInvite(projectId, username);
+        db.deleteProjectInvite(projectId, username);
 
         res.redirect("/home");
     }else{

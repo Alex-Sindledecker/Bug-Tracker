@@ -1,12 +1,7 @@
 import mongoose, {Schema, Types} from "mongoose";
 
-import Database from "./database.js";
-import res from "express/lib/response.js";
-
-export class MongoDatabase extends Database{
-    constructor(){ 
-        super();
-    
+export class MongoDatabase{
+    constructor(){   
         this._bugSchema = {
             projectId: Schema.ObjectId,
             level: Number,

@@ -8,8 +8,7 @@ import LocalStrategy from "passport-local";
 import bcrypt from "bcrypt";
 
 //Local imports
-import { MongoDatabase } from "./data/mongo_database.js";
-import { DataManager } from "./data/data_manager.js";
+import { connectDB, getDB } from "./database.js";
 import __dirname from "./__dirname.js";
 
 //Routing imports 
@@ -18,18 +17,10 @@ import projectRoutes from "./routes/project.js";
 import loginRoutes from "./routes/login.js"
 import signupRoutes from "./routes/signup.js"
 
+await connectDB();
+
 const port = 3000;
 const app = express();
-
-let database = new MongoDatabase();
-let dataManager = new DataManager(database);
-await dataManager.initDb(process.env.MONGO_URL);
-
-//Custom middleware that adds the data manager object to the request object. This allows the database to be easily used with express routing
-app.use((req, res, next) => {
-    req.db = dataManager;
-    next();
-});
 
 //Set the static (public) folder for ejs and setup body parser
 app.use(express.static("static"));
@@ -48,7 +39,7 @@ app.use(passport.session());
 
 //Passport strategy
 passport.use(new LocalStrategy(async (username, password, cb) => {
-    const user = await dataManager.getUser(username);
+    const user = await getDB().getUser(username);
 
     if (user == null)
         return cb(null, false, {message: `Could not find a user with username: ${username}`});
