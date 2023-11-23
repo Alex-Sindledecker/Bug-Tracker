@@ -51,6 +51,16 @@ hr{
     transform: rotate(360deg);
 }
 
+#invalid-password-list{
+    display: none;
+    list-style:square;
+}
+
+#invalid-confirm-password-list{
+    display: none;
+    list-style: square;
+}
+
 .huge-text{
     
 }

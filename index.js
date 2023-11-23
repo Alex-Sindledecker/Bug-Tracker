@@ -11,6 +11,7 @@ import bcrypt from "bcrypt";
 import { MongoDatabase } from "./data/mongo_database.js";
 import { DataManager } from "./data/data_manager.js";
 import __dirname from "./__dirname.js";
+import { isValidPassword } from "./data/data_validator.js";
 
 //Routing imports 
 import homeRoutes from "./routes/home.js";
@@ -52,6 +53,9 @@ passport.use(new LocalStrategy(async (username, password, cb) => {
 
     if (user == null)
         return cb(null, false, {message: `Could not find a user with username: ${username}`});
+
+    if (isValidPassword(password) == false)
+        return cb(null, false, {message: "Password could not be validated"});
 
     bcrypt.compare(password, user.password, (err, result) => {
         if (err)

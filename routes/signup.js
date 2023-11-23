@@ -1,6 +1,7 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import __dirname from "../__dirname.js";
+import { isValidPassword } from "../data/data_validator.js"
 
 const router = express.Router();
 const saltRounds = 10; //For bcrypt hashing
@@ -20,7 +21,9 @@ router.post("/", async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
-    //Validate username and password here
+    if (isValidPassword(password) == false){
+        res.redirect(__dirname + "/views/signup.ejs");
+    }
 
     //Validate that the user does not exist yet. If they do, redirect back to the signup page with the email currently in use
     if (await req.db.getUser(username) != null){

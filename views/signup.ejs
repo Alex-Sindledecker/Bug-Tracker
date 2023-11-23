@@ -17,8 +17,22 @@
                 <input name="username" type="email" placeholder="email@domain.com" required/>
                 <label for="email">Password:</label>
                 <input id="password" name="password" type="password" placeholder="Password" required/>
+                <ul id="invalid-password-list">
+                    <li id="uppercase-character-warning">At least one uppercase character</li>
+                    <li id="lowercase-character-warning">At least one lowercase character</li>
+                    <li id="digit-warning">At least one digit 0-9</li>
+                    <li id="special-character-warning">At least one special character (!,@,#,$,%,^,*,etc...)</li>
+                    <li id="length-warning">Must be between 8 and 25 characters long (!,@,#,$,%,^,*,etc...)</li>
+                </ul>
                 <label for="confirmpassword">Confirm Password</label>
                 <input id="confirmpassword" name="confirmpassword" type="password" placeholder="Confirm Password" required/>
+                <ul id="invalid-confirm-password-list">
+                    <li id="uppercase-character-warning-1">At least one uppercase character</li>
+                    <li id="lowercase-character-warning-1">At least one lowercase character</li>
+                    <li id="digit-warning-1">At least one digit 0-9</li>
+                    <li id="special-character-warning-1">At least one special character (!,@,#,$,%,^,*,etc...)</li>
+                    <li id="length-warning-1">Must be between 8 and 25 characters long (!,@,#,$,%,^,*,etc...)</li>
+                </ul>
                 <p id="password-match-warning" class="warning-text">Passwords do not match!</p>
                 <button class="overlay-button" type="submit">Sign Up!</button>
                 <div class="other-login-options">
