@@ -1,6 +1,5 @@
 import express from "express";
-import { getDB } from "../database.js";
-import __dirname from "../__dirname.js";
+import { getDataManager } from "../database.js";
 
 const router = express.Router();
 
@@ -8,15 +7,15 @@ const router = express.Router();
 router.get("/:id", async (req, res) => {
     if (req.isAuthenticated()){
         try{
-            const db = getDB();
+            const db = getDataManager();
 
             const project = await db.getProject(req.params.id);
             const bugs = await db.getBugs(project.id);
 
-            res.render(__dirname + "/views/project.ejs", {username: req.user.email, project: project, bugs: bugs, archivePage: false});
+            res.render("project.ejs", {username: req.user.email, project: project, bugs: bugs, archivePage: false});
         } catch (error){
             console.log(error.message);
-            res.status(404).render(__dirname + "/views/not-found-404.ejs");
+            res.status(404).render("not-found-404.ejs");
         }
 
     } else {
@@ -27,7 +26,7 @@ router.get("/:id", async (req, res) => {
 //https://localhost:3000/project/id/archive
 router.post("/:id/archive", async (req, res) => {
     if (req.isAuthenticated()){
-        const db = getDB();
+        const db = getDataManager();
 
         const projectId = req.params.id;
         const bugId = req.body.id;
@@ -49,16 +48,16 @@ router.post("/:id/archive", async (req, res) => {
 //https://localhost:3000/project/id/archive
 router.get("/:id/archive", async (req, res) => {
     if (req.isAuthenticated()){
-        const db = getDB();
+        const db = getDataManager();
 
         try{
             const project = await db.getProject(req.params.id);
             const bugs = await db.getArchivedBugs(project.id);
 
-            res.render(__dirname + "/views/project.ejs", {username: req.user.email, project: project, bugs: bugs, archivePage: true});
+            res.render("project.ejs", {username: req.user.email, project: project, bugs: bugs, archivePage: true});
         } catch (error){
             console.log(error.message);
-            res.status(404).render(__dirname + "/views/not-found-404.ejs");
+            res.status(404).render("not-found-404.ejs");
         }
     } else {
         res.redirect("/login");
@@ -68,7 +67,7 @@ router.get("/:id/archive", async (req, res) => {
 //https://localhost:3000/project/id/restore
 router.post("/:id/restore", async (req, res) => {
     if (req.isAuthenticated()){
-        const db = getDB();
+        const db = getDataManager();
 
         const projectId = req.params.id;
         const bugId = req.body.id;
@@ -91,7 +90,7 @@ router.post("/:id/restore", async (req, res) => {
 //https://localhost:3000/project/id/delete
 router.post("/:id/delete", async (req, res) => {
     if (req.isAuthenticated()){
-        const db = getDB();
+        const db = getDataManager();
 
         const bugId = req.body.id;
 
@@ -112,7 +111,7 @@ router.post("/:id/delete", async (req, res) => {
 //https://localhost:3000/project/id/new
 router.post("/:id/new", async (req, res) => {
     if (req.isAuthenticated()){
-        const db = getDB();
+        const db = getDataManager();
 
         const projectId = req.params.id;
         const dataModel = {
@@ -132,7 +131,7 @@ router.post("/:id/new", async (req, res) => {
 
 router.post("/:id/share", (req, res) => {
     if (req.isAuthenticated()){
-        const db = getDB();
+        const db = getDataManager();
 
         const projectId = req.params.id;
         const targetUsername = req.body.email;
@@ -150,7 +149,7 @@ router.post("/:id/share", (req, res) => {
 
 router.post("/:id/join", (req, res) => {
     if (req.isAuthenticated()){
-        const db = getDB();
+        const db = getDataManager();
 
         const username = req.user.email;
         const projectId = req.params.id;
@@ -166,7 +165,7 @@ router.post("/:id/join", (req, res) => {
 
 router.post("/:id/decline", (req, res) => {
     if (req.isAuthenticated()){
-        const db = getDB();
+        const db = getDataManager();
 
         const username = req.user.email;
         const projectId = req.params.id;

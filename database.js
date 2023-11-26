@@ -12,8 +12,12 @@ export async function connectDB(){
 }
 
 //Gets the database
-export function getDB(){
+export function getDataManager(){
     return dataManager;
+}
+
+export function getDatabase(){
+    return dataManager.database;
 }
 
 export async function disconnectDB(){
