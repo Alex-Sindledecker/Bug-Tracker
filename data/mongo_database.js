@@ -69,6 +69,15 @@ export class MongoDatabase{
         };
     }
 
+    //Deletes a user from the database
+    async deleteUser(username){
+        const user = await this._UserModel.deleteOne({username: username});
+        if (user === null)
+            return false;
+
+        return true;
+    }
+
     async addProject(creatorUsername, name, description){
         let project = new this._ProjectModel({
             ownerUsername: creatorUsername,

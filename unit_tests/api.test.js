@@ -1,5 +1,7 @@
 //All database operations are mocked. Database specific testing is preformed in another file
 
+import passport from "passport";
+import { Express } from "express";
 import { MongoDatabase } from "../data/mongo_database";
 
 import { runApp, initApp } from "../app"
@@ -20,25 +22,37 @@ jest.spyOn(MongoDatabase.prototype, 'addUser').mockImplementation((username, pas
     return new Promise((resolve, reject) => {
         resolve({username: username, password: password});
     });
-})
+});
+
+jest.spyOn(MongoDatabase.prototype, 'deleteUser').mockImplementation((username) => {
+    return new Promise((resolve, reject) => {
+        resolve(true);
+    });
+});
+
 //------------------------------------------------------------------------------------------------
 
 //SETUP
 //------------------------------------------------------------------------------------------------
 beforeAll((done) => {
     //Start the server
+    const mockAuth = (req, res, next) => {
+        req.user = { email: "dev" };
+        next();
+    };
+
+    const middleWare = [mockAuth];
+
     initApp().then(() => {
-        server = runApp();
+        server = runApp(middleWare);
         done();
     });
 });
 
 afterAll((done) => {
     //Stop the server
-    console.log("closing");
     server.then(async obj => {
         await obj.close();
-        console.log("done");
         done();
     });
 });
@@ -50,7 +64,11 @@ describe("Tests API routes", () => {
 
     //Test 1 - GET /user
     test("Tests GET /api/user/test_username --> Expects test_username", (done) => {
-        axios.get("http://localhost:3000/api/user/test_username").then(result => {
+        axios.get("http://localhost:3000/api/user/", {
+            params: {
+                username: "test_username"
+            }
+        }).then(result => {
             expect(result.data).toMatchObject({
                 username: 'test_username',
                 password: '--test-password--',
@@ -69,6 +87,15 @@ describe("Tests API routes", () => {
             done();
         });
     });
+
+    /*
+    test("Tests DELETE /api/user with username: 'uname'", (done) => {
+        axios.delete("http://localhost:3000/api/user").then(response => {
+            expect(response.status).toBe(200);
+            done();
+        });
+    });
+    */
 
 });
 //------------------------------------------------------------------------------------------------

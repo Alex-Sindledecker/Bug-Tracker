@@ -22,7 +22,7 @@ export async function initApp(){
 }
 
 //Returns a method to close the server instance
-export async function runApp(){
+export async function runApp(middleware){
     const port = 3000;
     let app = express();
 
@@ -75,6 +75,12 @@ export async function runApp(){
     app.use("/login", loginRoutes);
     app.use("/signup", signupRoutes);
     app.use("/api", apiRoutes);
+
+    if (middleware != undefined) {
+        middleware.forEach(fn => {
+            app.use(fn);
+        })
+    }
 
     //Index route
     app.get("/", (req, res) => {
