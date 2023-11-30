@@ -17,7 +17,7 @@
                     <div>
                         <a class="project-banner-button" href="/project/<%=project.id%>/">Project Home</a>&emsp;
                         <a class="project-banner-button" href="/project/<%=project.id%>/archive/">Archive</a>&emsp;
-                        <button id="share-button" class="project-banner-button">Share</button>
+                        <% if (isProjectOwner == true) {%><a id="share-button" class="project-banner-button">Share</a><% } %>
                     </div>
                 </div>
                 <button class="" onclick="sortBugsLowHigh()">Sort Accending</button>
@@ -92,16 +92,55 @@
                 </button>
             </form>
 
-            <form id="share-project-overlay" class="site-overlay hidden" method="post" action="/project/<%=project.id%>/share">
-                <svg class="close-overlay-button" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-                </svg>
-                <h3>Share</h3>
-                <input name="email" type="email" placeholder="Email Address" required/>
-                <button class="overlay-button" type="submit">
-                    Share
-                </button>
-            </form>
+            <% if (isProjectOwner == true) { %>
+                <div id="share-project-overlay" class="site-overlay hidden" method="post" action="/project/<%=project.id%>/share">
+                    <svg class="close-overlay-button" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                    </svg>
+                    <h3>Share</h3>
+                    <input name="email" type="email" placeholder="Email Address" required/>
+                    <button id="share-project-button" class="overlay-button">
+                        Share
+                    </button>
+                </div>
+
+                <script>
+                    $("#share-project-button").on("click", () => {
+                        const email = $("#share-project-overlay input").val();
+                        console.log("Sending request...");
+                        $.ajax({
+                            //Request info
+                            url: "/project/<%=project.id%>/share",
+                            method: "POST",
+                            data: {
+                                email: email
+                            },
+
+                            //Response info
+                            dataType: "json",
+
+                            //After request
+                            success: (data, status, jqxhr) => {
+                                console.log("Success");
+                                console.log(data);
+                                console.log(status);
+                                if (status == "success" && data.sharedWith != undefined){
+                                    $("#share-project-overlay").addClass("hidden");
+                                    alert("Share request successfully sent to " + email);
+                                } else if (status == "success") {
+                                    alert(data.error);
+                                }
+                            },
+                            error: (jqxhr, status, err) => {
+                                console.log("Failure");
+                                console.log(err);
+                                console.log(status);
+                                alert("There was a problem sharing the project with " + email + " :(");
+                            }
+                        });
+                    });
+                </script>
+            <% } %>
 
         <% } else { %>
             <div class="main-content flex-center-all medium-gap">
@@ -114,7 +153,7 @@
 
         <script>
             $("#share-button").on("click", () => {
-                $("#share-project-overlay").show();
+                $("#share-project-overlay").removeClass("hidden");
             });
 
             function sortBugsLowHigh(){

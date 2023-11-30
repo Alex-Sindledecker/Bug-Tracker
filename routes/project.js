@@ -12,7 +12,7 @@ router.get("/:id", async (req, res) => {
             const project = await db.getProject(req.params.id);
             const bugs = await db.getBugs(project.id);
 
-            res.render("project.ejs", {username: req.user.email, project: project, bugs: bugs, archivePage: false});
+            res.render("project.ejs", {username: req.user.email, project: project, bugs: bugs, archivePage: false, isProjectOwner: project.ownerUsername == req.user.email});
         } catch (error){
             console.log(error.message);
             res.status(404).render("not-found-404.ejs");
@@ -54,7 +54,7 @@ router.get("/:id/archive", async (req, res) => {
             const project = await db.getProject(req.params.id);
             const bugs = await db.getArchivedBugs(project.id);
 
-            res.render("project.ejs", {username: req.user.email, project: project, bugs: bugs, archivePage: true});
+            res.render("project.ejs", {username: req.user.email, project: project, bugs: bugs, archivePage: true, isProjectOwner: project.ownerUsername == req.user.email});
         } catch (error){
             console.log(error.message);
             res.status(404).render("not-found-404.ejs");
@@ -129,21 +129,37 @@ router.post("/:id/new", async (req, res) => {
     }
 });
 
-router.post("/:id/share", (req, res) => {
+router.post("/:id/share", async (req, res) => {
+    //Verify user is authenticated
     if (req.isAuthenticated()){
         const db = getDataManager();
 
         const projectId = req.params.id;
         const targetUsername = req.body.email;
         
-        //TODO: Verify that target username exists and that the authenticated user is allowed to share this project
-        
-        db.shareProject(projectId, targetUsername).then(p => {
-            if (p == null)
-                res.sendStatus(500);
-            else
-                res.sendStatus(200);
-        })
+        const targetUser = await db.getUser(targetUsername);
+        const projectShares = await db.getPendingProjects(targetUsername);
+
+        //Ensure target user exists before sharing, that the target user doesn't already have access to that project, that the project isn't pending with the target user,
+        //and that the authenticated user is the owner of the project
+        if (targetUser != null && 
+            targetUser.projects.includes(projectId) == false && 
+            projectShares.find(p => p.id == projectId) == undefined &&
+            req.user.email == db.getProject(projectId).ownerUsername) {
+
+            db.shareProject(projectId, targetUsername).then(p => {
+                if (p == null)
+                    res.sendStatus(500);
+                else
+                    res.status(200).send(JSON.stringify({sharedWith: targetUsername}));
+            });
+        } else if (targetUser != null) {
+            res.status(200).send(JSON.stringify({error: "This project has already been shared with that user, or is currently pending with that user..."}));
+        } else {
+            res.status(200).send(JSON.stringify({error: "User not found!"}));
+        }
+    } else {
+        res.status(403).redirect("/login");
     }
 });
 
