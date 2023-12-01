@@ -88,3 +88,29 @@ $(".level-selection").click(function(){
             break;
     }
 });
+
+$(".more-info-card").on("click", function() {
+    $("#bug-info-overlay").removeClass("hidden");
+
+    $("#bug-info-overlay-date").text($(this).attr("data-date"));
+    $("#bug-info-overlay-name").text($(this).attr("data-name"));
+    $("#bug-info-overlay-author").text($(this).attr("data-author"));
+    $("#bug-info-overlay-description").text($(this).find("p").text());
+
+    let color;
+    switch ($(this).attr("data-level")){
+        case '1':
+            color = "green";
+            break;
+        case '2':
+            color = "yellow";
+            break;
+        case '3':
+            color = "red";
+            break;
+        case '4':
+            color = "magenta";
+            break;    
+    }
+    $("#bug-info-overlay-underline").css("background-color", color);
+});

@@ -24,7 +24,7 @@
                 <button class="" onclick="sortBugsHighLow()">Sort Decending</button>
                 <div class="bug-grid">
                         <% bugs.forEach(bug => { %>
-                            <div class="bug-card">
+                            <div class="bug-card more-info-card" data-level="<%=bug.level%>" data-name="<%=bug.name%>" data-date="11/29/23" data-author="Alex">
                                 <% if (bug.archived === false) { %>
                                     <div class="bug-level-<%=bug.level%>"></div>
                                 <% } else { %>
@@ -92,8 +92,21 @@
                 </button>
             </form>
 
+            <div id="bug-info-overlay" class="site-overlay hidden">
+                <svg class="close-overlay-button" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                </svg>
+                <h3 id="bug-info-overlay-name"></h3>
+                <div style="display: flex; gap: 1em">
+                    <p id="bug-info-overlay-author"></p> -
+                    <p id="bug-info-overlay-date"></p>
+                </div>
+                <p id="bug-info-overlay-description"></p>
+                <div id="bug-info-overlay-underline" style="width: 100%; height: 1px;"></div>
+            </div>
+
             <% if (isProjectOwner == true) { %>
-                <div id="share-project-overlay" class="site-overlay hidden" method="post" action="/project/<%=project.id%>/share">
+                <div id="share-project-overlay" class="site-overlay hidden">
                     <svg class="close-overlay-button" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
                         <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
                     </svg>

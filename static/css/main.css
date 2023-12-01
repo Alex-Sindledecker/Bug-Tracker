@@ -39,6 +39,11 @@ hr{
     border: none;
 }
 
+p {
+    line-height: 1.5;
+    color: var(--font-color);
+}
+
 #daylight-button{
     background: none;
     border: none;
@@ -149,6 +154,11 @@ hr{
 
     background-color:var(--card-background);
     border-radius: 10px;
+}
+
+.bug-card:hover{
+    box-shadow: 0 5px 5px #464446;
+    cursor: pointer;
 }
 
 .button-card{
@@ -264,6 +274,8 @@ hr{
     flex-direction: column;
     gap: 2em;
     align-items: center;
+    max-width: 60ch;
+    color: var(--font-color);
 }
 
 .site-overlay > h3{
