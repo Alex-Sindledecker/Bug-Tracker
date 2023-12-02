@@ -35,8 +35,8 @@ export class DataManager{
         return model;
     }
 
-    async createBug(projectId, name, description, level){                
-        return this.database.addBug(projectId, level, name, description);
+    async createBug(projectId, name, description, level, author){                
+        return this.database.addBug(projectId, level, name, description, author);
     }
 
     async getProject(id){

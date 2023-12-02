@@ -12,7 +12,9 @@ export class MongoDatabase extends Database{
             level: Number,
             name: String,
             description: String,
-            archived: Boolean
+            archived: Boolean,
+            createdOn: String,
+            createdBy: String
         };
 
         this._projectSchema = {
@@ -87,13 +89,15 @@ export class MongoDatabase extends Database{
         return null;
     }
 
-    async addBug(projectId, level, name, description){
+    async addBug(projectId, level, name, description, author){
         let bug = new this._BugModel({
             projectId: new Types.ObjectId(projectId),
             name: name,
             description: description,
             level: level,
-            archived: false
+            archived: false,
+            createdOn: new Date().toISOString().split('T')[0],
+            createdBy: author
         });
 
         const b = await bug.save();
@@ -244,7 +248,9 @@ export class MongoDatabase extends Database{
             name: bug.name,
             description: bug.description,
             level: bug.level,
-            archived: bug.archived
+            archived: bug.archived,
+            createdOn: bug.createdOn,
+            createdBy: bug.createdBy
         }
     }
 

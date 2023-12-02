@@ -120,7 +120,7 @@ router.post("/:id/new", async (req, res) => {
             description: req.body.description
         }
         //TODO: request validation
-        await db.createBug(projectId, dataModel.name, dataModel.description, dataModel.level);
+        await db.createBug(projectId, dataModel.name, dataModel.description, dataModel.level, req.user.email);
 
         res.redirect("/project/" + projectId);
 
@@ -140,12 +140,14 @@ router.post("/:id/share", async (req, res) => {
         const targetUser = await db.getUser(targetUsername);
         const projectShares = await db.getPendingProjects(targetUsername);
 
+        const targetUserIsNotNull = targetUser != null;
+        const targetUserHasProject = targetUser.projects.includes(projectId);
+        const projectAlreadyShared = projectShares.find(p => p.id == projectId) != undefined;
+        const authedUserOwnsProject = req.user.email == (await db.getProject(projectId)).ownerUsername;
+
         //Ensure target user exists before sharing, that the target user doesn't already have access to that project, that the project isn't pending with the target user,
         //and that the authenticated user is the owner of the project
-        if (targetUser != null && 
-            targetUser.projects.includes(projectId) == false && 
-            projectShares.find(p => p.id == projectId) == undefined &&
-            req.user.email == db.getProject(projectId).ownerUsername) {
+        if (targetUserIsNotNull == true && targetUserHasProject == false && projectAlreadyShared == false && authedUserOwnsProject == true) {
 
             db.shareProject(projectId, targetUsername).then(p => {
                 if (p == null)

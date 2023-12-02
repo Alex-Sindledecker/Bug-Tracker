@@ -24,7 +24,7 @@
                 <button class="" onclick="sortBugsHighLow()">Sort Decending</button>
                 <div class="bug-grid">
                         <% bugs.forEach(bug => { %>
-                            <div class="bug-card more-info-card" data-level="<%=bug.level%>" data-name="<%=bug.name%>" data-date="11/29/23" data-author="Alex">
+                            <div class="bug-card more-info-card" data-level="<%=bug.level%>" data-name="<%=bug.name%>" data-date="<%=bug.createdOn%>" data-author="<%=bug.createdBy%>">
                                 <% if (bug.archived === false) { %>
                                     <div class="bug-level-<%=bug.level%>"></div>
                                 <% } else { %>
@@ -101,7 +101,7 @@
                     <p id="bug-info-overlay-author"></p> -
                     <p id="bug-info-overlay-date"></p>
                 </div>
-                <p id="bug-info-overlay-description"></p>
+                <p id="bug-info-overlay-description" ></p>
                 <div id="bug-info-overlay-underline" style="width: 100%; height: 1px;"></div>
             </div>
 

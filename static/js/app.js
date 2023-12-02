@@ -42,7 +42,7 @@ $("#daylight-button").click(() => {
     }
 });
 
-$(".card-button").click(function(){
+$(".card-button").click(function(event){
     const action = $(this).attr("name").split('-')[0];
 
     let data = {
@@ -60,6 +60,9 @@ $(".card-button").click(function(){
     console.log(projectId);
 
     $.post(`/project/${projectId}/${action}`, data, callback);
+
+    //Stops click event from triggering on the bug card, resulting in data being shown about it.
+    event.stopPropagation();
 });
 
 $(".add-bug-card").click(() => {
