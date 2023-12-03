@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title></title>
+        <link rel="stylesheet" href="/css/main.css" type="text/css"/>
+        <link rel="stylesheet" href="/css/profile.css" type="text/css"/>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    </head>
+    <body>
+
+        <%- include("partials/header.ejs") %>
+        <main class="main-content">
+            <div class="profile-container">
+                <h1>Hello <%= username %>!</h1>
+                <h2>Profile Info</h2> <hr/>
+                <ul style="text-indent: 4ch;">
+                    <li>Email address: <%= username %></li>
+                    <li>Password: <b>********</b></li>
+                    <li><button id="change-password-button" class="project-banner-button">Change Password</button></li>
+                </ul>
+                <h2>Some Statistics About You!</h2> <hr/>
+                <p>You've done all these great things: </p>
+                <ul style="text-indent: 4ch;">
+                    <li>Created <b>2</b> projects!</li>
+                    <li>Joined <b>0</b> projects!</li>
+                    <li>Created <b>10</b> issues!</li>
+                    <li>Resolved <b>3</b> issues!</li>
+                    <li>Permanently deleted <b>0</b> issues!</li>
+                </ul>
+            </div>
+        </main>
+        
+        <div id="popup-overlay-background">
+            <div id="popup-overlay">
+                <p>An email was sent to <%=username%>!</p>
+                <p>Check your email for a link to change your password</p>
+                <button id="hide-popup-overlay-button" class="overlay-button">Ok</button>
+            </div>
+        </div>
+
+        <%- include ("partials/footer.ejs") %>
+
+        <script>
+            $("#change-password-button").on("click", () => {
+                $.post("/profile/changePassword", {}, (data, status) => {
+                    $("#popup-overlay-background").show();
+                    $("#popup-overlay").slideDown();
+                    $("#popup-overlay").children("p").remove();
+                    $("#popup-overlay").css("display", "flex");
+
+                    if (status == "success"){
+                        $("<p>An email was sent to <%=username%>!</p><p>Check your email for a link to change your password</p>").insertBefore("#hide-popup-overlay-button");
+                    } else {
+                        $("<p>There was an issue sending an email to change your password!</p><p>Please try again...</p>").insertBefore("#hide-popup-overlay-button");
+                    }
+                });
+            });
+
+            $("#hide-popup-overlay-button").on("click", () => {
+                $("#popup-overlay").slideUp(150, () => {
+                    $("#popup-overlay-background").hide(100);
+                });
+            });
+        </script>
+    </body>
+</html>

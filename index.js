@@ -14,8 +14,9 @@ import { isValidPassword } from "./data/data_validator.js";
 //Routing imports 
 import homeRoutes from "./routes/home.js";
 import projectRoutes from "./routes/project.js";
-import loginRoutes from "./routes/login.js"
-import signupRoutes from "./routes/signup.js"
+import loginRoutes from "./routes/login.js";
+import signupRoutes from "./routes/signup.js";
+import profileRoutes from "./routes/profile.js";
 
 import { connectDB, getDataManager } from "./database.js";
 
@@ -75,10 +76,14 @@ app.use("/home", homeRoutes);
 app.use("/project", projectRoutes);
 app.use("/login", loginRoutes);
 app.use("/signup", signupRoutes);
+app.use("/profile", profileRoutes);
 
 //Index route
 app.get("/", (req, res) => {
-    res.render(__dirname + "/views/index.ejs");
+    if (req.isAuthenticated())
+        res.render(__dirname + "/views/index.ejs", { username: req.user.email });
+    else
+        res.render(__dirname + "/views/index.ejs");
 });
 
 //Log the user out
