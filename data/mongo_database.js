@@ -14,7 +14,7 @@ export class MongoDatabase extends Database{
             description: String,
             archived: Boolean,
             createdOn: String,
-            createdBy: String
+            createdBy: String,
         };
 
         this._projectSchema = {
@@ -26,7 +26,14 @@ export class MongoDatabase extends Database{
         this._userSchema = {
             username: String,
             password: String,
-            projects: [Schema.ObjectId]
+            projects: [Schema.ObjectId],
+            stats: {
+                totalProjectsCreated: Number,
+                totalJoinedProjects: Number,
+                totalCreatedBugs: Number,
+                totalArchivedBugs: Number,
+                totalDeletedBugs: Number
+            }
         };
 
         this._projectShareSchema = {
@@ -54,7 +61,14 @@ export class MongoDatabase extends Database{
         let user = new this._UserModel({
             username: username,
             password: password,
-            projects: []
+            projects: [],
+            stats: {
+                totalProjectsCreated: 0,
+                totalJoinedProjects: 0,
+                totalCreatedBugs: 0,
+                totalArchivedBugs: 0,
+                totalDeletedBugs: 0
+            }
         });
 
         const u = await user.save();
@@ -72,7 +86,8 @@ export class MongoDatabase extends Database{
         return {
             username: user.username,
             password: user.password,
-            projects: user.projects
+            projects: user.projects,
+            stats: user.stats
         };
     }
 
@@ -82,6 +97,8 @@ export class MongoDatabase extends Database{
             name: name,
             description: description
         });
+
+        const r = await this._UserModel.updateOne({username: creatorUsername}, {$inc: {"stats.totalProjectsCreated": 1}});
 
         const p = await project.save();
         if (p === project)
@@ -99,6 +116,9 @@ export class MongoDatabase extends Database{
             createdOn: new Date().toISOString().split('T')[0],
             createdBy: author
         });
+
+        //Update user model's total created bugs
+        await this._UserModel.updateOne({username: author}, {$inc: {"stats.totalCreatedBugs": 1}});
 
         const b = await bug.save();
         return this.__toRawBug(b.toObject());
@@ -207,16 +227,29 @@ export class MongoDatabase extends Database{
         return this.__toRawBug(model);
     }
 
-    async modifyBug(id, key, value){
+    async modifyBug(id, key, value, statUpdateInfo){
         await this._BugModel.updateOne({_id: new Types.ObjectId(id)}, {
             [key]: value
         });
         const model = await this._BugModel.findOne({_id: new Types.ObjectId(id)});
 
+        if (statUpdateInfo !== undefined){
+            //Update statistics about user if relevant
+            const u = {
+                $inc: {
+                    [statUpdateInfo.statName]: statUpdateInfo.statInc
+                }
+            };
+            await this._UserModel.updateOne({username: model.createdBy}, u);
+        }
+
         return this.__toRawBug(model);
     }
 
     async deleteBug(id){
+        const bugOwner = (await this._BugModel.findOne({_id: new Types.ObjectId(id)})).createdBy;
+        await this._UserModel.updateOne({username: bugOwner}, {$inc: {"stats.totalDeletedBugs": 1}});
+
         return (await this._BugModel.deleteOne({_id: new Types.ObjectId(id)})).deletedCount > 0;
     }
 

@@ -23,11 +23,11 @@
                 <h2>Some Statistics About You!</h2> <hr/>
                 <p>You've done all these great things: </p>
                 <ul style="text-indent: 4ch;">
-                    <li>Created <b>2</b> projects!</li>
-                    <li>Joined <b>0</b> projects!</li>
-                    <li>Created <b>10</b> issues!</li>
-                    <li>Resolved <b>3</b> issues!</li>
-                    <li>Permanently deleted <b>0</b> issues!</li>
+                    <li>Created <b><%=userStats.totalProjectsCreated%></b> projects!</li>
+                    <li>Joined <b><%=userStats.totalJoinedProjects%></b> projects!</li>
+                    <li>Created <b><%=userStats.totalCreatedBugs%></b> issues!</li>
+                    <li>Resolved <b><%=userStats.totalArchivedBugs%></b> issues!</li>
+                    <li>Permanently deleted <b><%=userStats.totalDeletedBugs%></b> issues!</li>
                 </ul>
             </div>
         </main>

@@ -1,11 +1,16 @@
 import express from "express";
-import { DataManager } from "../data/data_manager.js";
+import {getDataManager} from "../database.js";
 
 let router = express.Router();
 
 router.get("/", (req, res) => {
-    if (req.isAuthenticated())
-        res.render("profile.ejs", {username: req.user.email});
+    if (req.isAuthenticated()){
+        const db = getDataManager();
+        db.getUser(req.user.email).then(user => {
+            console.log(user);
+            res.render("profile.ejs", {username: req.user.email, userStats: user.stats});
+        });
+    }
     else
         res.redirect("/login");
 });
