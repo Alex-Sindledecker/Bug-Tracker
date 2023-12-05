@@ -81,11 +81,17 @@ export class DataManager{
     }
 
     async archiveBug(id){
-        this.database.modifyBug(id, "archived", true);
+        this.database.modifyBug(id, "archived", true, {
+            statName: "stats.totalArchivedBugs",
+            statInc: 1
+        });
     }
 
     async unarchiveBug(id){
-        this.database.modifyBug(id, "archived", false);
+        this.database.modifyBug(id, "archived", false, {
+            statName: "stats.totalArchivedBugs",
+            statInc: -1
+        });
     }
     
     async deleteProjectInvite(projectId, username){
@@ -93,6 +99,7 @@ export class DataManager{
     }
 
     async deleteBug(id){
+
         return this.database.deleteBug(id);
     }
 
