@@ -7,7 +7,6 @@ router.get("/", (req, res) => {
     if (req.isAuthenticated()){
         const db = getDataManager();
         db.getUser(req.user.email).then(user => {
-            console.log(user);
             res.render("profile.ejs", {username: req.user.email, userStats: user.stats});
         });
     }

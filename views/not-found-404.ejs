@@ -9,10 +9,15 @@
     </head>
     <body>
         
+        <%- include("partials/header.ejs") %>
         <div class="main-content flex-center-all medium-gap">
             <h2 class="big-text">404 Error!</h2>
-            <h1 class="huge-text">Page not found :(</h1>
-            <a href="/">Return home</a>
+            <% if (locals.message) { %>
+                <%-message%>
+            <% } else { %>
+                <h1 class="huge-text">Page not found :(</h1>
+                <a href="/">Return home</a>
+            <% } %>
         </div>
 
         <%- include ("partials/footer.ejs") %>

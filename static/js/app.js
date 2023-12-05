@@ -56,7 +56,7 @@ $(".card-button").click(function(event){
         }
     };
 
-    let projectId = window.location.href.match(/\/project\/(\d+)/)[1];
+    let projectId = window.location.href.match(/\/project\/(\w+)/)[1];
     console.log(projectId);
 
     $.post(`/project/${projectId}/${action}`, data, callback);
