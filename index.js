@@ -98,6 +98,11 @@ app.get("/logout", (req, res) => {
     }
 });
 
+//Sends a 404 error for all unaccounted for routes.
+app.get("*", (req, res) => {
+    res.status(404).render("not-found-404.ejs", req.isAuthenticated() ? {username: req.user.email} : {});
+});
+
 //Run the application
 app.listen(port, () => {
     console.log("App running on port " + port);

@@ -4,11 +4,12 @@ import { getDataManager } from "../database.js";
 const router = express.Router();
 
 router.use((req, res, next) => {
-    if (req.isAuthenticated()){
+    if (req.isAuthenticated())
         next();
-    } else {
+    else if (req.method == "GET")
         res.redirect("/login");
-    }
+    else
+        res.sendStatus(403);
 });
 
 //Middleware that verifies that the user is authenticated and that they are allowed to access the project with the given id
