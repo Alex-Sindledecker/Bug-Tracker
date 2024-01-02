@@ -14,9 +14,9 @@
             <form method="post" action="/signup" class="site-overlay">
                 <h3>Sign Up</h3>
                 <label for="username">Email/Username:</label>
-                <input name="username" type="email" placeholder="email@domain.com" required/>
+                <input name="username" type="email" placeholder="email@domain.com" autocomplete="off" required/>
                 <label for="email">Password:</label>
-                <input id="password" name="password" type="password" placeholder="Password" required/>
+                <input id="password" name="password" type="password" placeholder="Password" autocomplete="off" required/>
                 <ul id="invalid-password-list">
                     <li id="uppercase-character-warning">At least one uppercase character</li>
                     <li id="lowercase-character-warning">At least one lowercase character</li>
@@ -25,7 +25,7 @@
                     <li id="length-warning">Must be between 8 and 25 characters long (!,@,#,$,%,^,*,etc...)</li>
                 </ul>
                 <label for="confirmpassword">Confirm Password</label>
-                <input id="confirmpassword" name="confirmpassword" type="password" placeholder="Confirm Password" required/>
+                <input id="confirmpassword" name="confirmpassword" type="password" placeholder="Confirm Password" autocomplete="off" required/>
                 <ul id="invalid-confirm-password-list">
                     <li id="uppercase-character-warning-1">At least one uppercase character</li>
                     <li id="lowercase-character-warning-1">At least one lowercase character</li>
