@@ -1,13 +1,33 @@
 import express from "express";
+import passport from "passport";
 import bcrypt from "bcrypt";
 
 import { getDataManager } from "../database.js";
 
 const router = express.Router();
+
 const saltRounds = 10; //For bcrypt hashing
 
-//https://localhost:3000/signup/
-router.get("/", (req, res) => {
+//---------------------------------------------------------------------------------------------------------------
+//Login routes
+//---------------------------------------------------------------------------------------------------------------
+router.get("/login", (req, res) => {
+    if (req.isAuthenticated())
+        res.redirect("/");
+    else
+        res.render("login.ejs");
+});
+
+router.post("/login", passport.authenticate("local", {
+    successRedirect: "/home",
+    failureRedirect: "/login",
+    failureMessage: true
+}));
+
+//---------------------------------------------------------------------------------------------------------------
+//Signup routes
+//---------------------------------------------------------------------------------------------------------------
+router.get("/signup", (req, res) => {
     if (req.isAuthenticated()){
         return res.redirect("/");
     }
@@ -15,9 +35,7 @@ router.get("/", (req, res) => {
     res.render("signup.ejs");
 });
 
-//https://localhost:3000/signup/
-//Route for when the user posts their sign up info
-router.post("/", async (req, res) => {
+router.post("/signup", async (req, res) => {
     const db = getDataManager();
 
     const username = req.body.username;
@@ -48,6 +66,20 @@ router.post("/", async (req, res) => {
         });
     }
 
+});
+
+//---------------------------------------------------------------------------------------------------------------
+//Logout
+//---------------------------------------------------------------------------------------------------------------
+router.get("/logout", (req, res) => {
+    if (req.isAuthenticated()){
+        req.logOut(err => {
+            if (err) console.log(err);
+            res.redirect("/");
+        });
+    } else {
+        res.redirect("/");
+    }
 });
 
 export default router;

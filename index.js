@@ -12,10 +12,9 @@ import __dirname from "./__dirname.js";
 import { isValidPassword } from "./data/data_validator.js";
 
 //Routing imports 
+import authRoutes from "./routes/auth.js";
 import homeRoutes from "./routes/home.js";
 import projectRoutes from "./routes/project.js";
-import loginRoutes from "./routes/login.js";
-import signupRoutes from "./routes/signup.js";
 import profileRoutes from "./routes/profile.js";
 
 import { connectDB, getDataManager } from "./database.js";
@@ -74,9 +73,8 @@ passport.deserializeUser((user, cb) => {
 //Routing
 app.use("/home", homeRoutes);
 app.use("/project", projectRoutes);
-app.use("/login", loginRoutes);
-app.use("/signup", signupRoutes);
 app.use("/profile", profileRoutes);
+app.use("/", authRoutes);
 
 //Index route
 app.get("/", (req, res) => {
@@ -84,18 +82,6 @@ app.get("/", (req, res) => {
         res.render(__dirname + "/views/index.ejs", { username: req.user.email });
     else
         res.render(__dirname + "/views/index.ejs");
-});
-
-//Log the user out
-app.get("/logout", (req, res) => {
-    if (req.isAuthenticated()){
-        req.logOut(err => {
-            if (err) console.log(err);
-            res.redirect("/");
-        });
-    } else {
-        res.redirect("/");
-    }
 });
 
 //Sends a 404 error for all unaccounted for routes.
