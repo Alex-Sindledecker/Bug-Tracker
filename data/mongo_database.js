@@ -86,7 +86,7 @@ export class MongoDatabase extends Database{
         return {
             username: user.username,
             password: user.password,
-            projects: user.projects,
+            projects: user.projects.map(p => p.toString()),
             stats: user.stats
         };
     }
@@ -257,6 +257,15 @@ export class MongoDatabase extends Database{
         const result = await this._ProjectModel.deleteOne({_id: new Types.ObjectId(id)});
 
         return result.deletedCount > 0;
+    }
+
+    async leaveProject(username, projectId){
+        let q = await this._UserModel.updateOne({username: username}, {
+            $pull: {
+                projects: new Types.ObjectId(projectId)
+            }
+        });
+        return q;
     }
 
     async deleteProjectShare(projectId, username){

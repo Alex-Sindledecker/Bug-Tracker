@@ -98,6 +98,10 @@ export class DataManager{
         this.database.deleteProjectShare(projectId, username);
     }
 
+    async leaveProject(username, projectId){
+        this.database.leaveProject(username, projectId);
+    }
+
     async deleteBug(id){
 
         return this.database.deleteBug(id);

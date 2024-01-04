@@ -29,14 +29,49 @@
                     <li>Resolved <b><%=userStats.totalArchivedBugs%></b> issues!</li>
                     <li>Permanently deleted <b><%=userStats.totalDeletedBugs%></b> issues!</li>
                 </ul>
+                <h2>Your Projects</h2><hr/>
+                <ul>
+                    <% if (locals.projects) { %>
+                        <% projects.forEach(project => { %>
+                            <li class="profile-project-listing">
+                                <h4><%=project.name%></h4>
+                                <% if (project.ownerUsername == username) { %>
+                                    <button class="project-action-button">Delete!</button>
+                                    <form class="popup" method="post" action="/profile/deleteProject">
+                                        <input name="projectId" value="<%=project.id%>" type="hidden" />
+                                        <p>Are you sure you want to delete <b><%=project.name%>?</b></p>
+                                        <p><i>This action is permanent and cannot be undone!</i></p>
+                                        <div style="display: flex;justify-content: space-between;">
+                                            <button class="overlay-button-yesno button-green" type="submit">Yes</button>
+                                            <button class="hide-popup-overlay-button overlay-button-yesno button-red" type="button">No</button>
+                                        </div>
+                                    </form>
+                                <% } else { %>
+                                    <button class="project-action-button">Leave!</button>
+                                    <form class="popup" method="post" action="/profile/leaveProject">
+                                        <input name="projectId" value="<%=project.id%>" type="hidden" />
+                                        <p>Are you sure you want to leave <b><%=project.name%>?</b></p>
+                                        <p><i>You won't be able to join back unless invited!</i></p>
+                                        <div style="display: flex;justify-content: space-between;">
+                                            <button class="overlay-button-yesno button-green" type="submit">Yes</button>
+                                            <button class="hide-popup-overlay-button overlay-button-yesno button-red" type="button">No</button>
+                                        </div>
+                                    </form>
+                                <% } %>
+                            </li>
+                        <% }); %>
+                    <% } else { %>
+                        <h4>There was an error loading your projects :(</h4>
+                    <% } %>
+                </ul>
             </div>
         </main>
         
-        <div id="popup-overlay-background">
-            <div id="popup-overlay">
+        <div class="popup-overlay-background">
+            <div class="popup" id="popup-overlay">
                 <p>An email was sent to <%=username%>!</p>
                 <p>Check your email for a link to change your password</p>
-                <button id="hide-popup-overlay-button" class="overlay-button">Ok</button>
+                <button class="hide-popup-overlay-button overlay-button">Ok</button>
             </div>
         </div>
 
@@ -45,9 +80,9 @@
         <script>
             $("#change-password-button").on("click", () => {
                 $.post("/profile/changePassword", {}, (data, status) => {
-                    $("#popup-overlay-background").show();
+                    $(".popup-overlay-background").show();
                     $("#popup-overlay").slideDown();
-                    $("#popup-overlay").children("p").remove();
+                    //$("#popup-overlay").children("p").remove();
                     $("#popup-overlay").css("display", "flex");
 
                     if (status == "success"){
@@ -58,10 +93,18 @@
                 });
             });
 
-            $("#hide-popup-overlay-button").on("click", () => {
-                $("#popup-overlay").slideUp(150, () => {
-                    $("#popup-overlay-background").hide(100);
+            $(".hide-popup-overlay-button").on("click", function() {
+                console.log($(this));
+                console.log($(this).parent());
+                $(this).closest(".popup").slideUp(150, () => {
+                    $(".popup-overlay-background").hide(100);
                 });
+            });
+
+            $(".project-action-button").on("click", function() {
+                $(".popup-overlay-background").show();
+                $(this).next().slideDown();
+                $(this).next().css("display", "flex");
             });
         </script>
     </body>
