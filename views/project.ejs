@@ -17,11 +17,15 @@
                     <div>
                         <a class="project-banner-button" href="/project/<%=project.id%>/">Project Home</a>&emsp;
                         <a class="project-banner-button" href="/project/<%=project.id%>/archive/">Archive</a>&emsp;
-                        <% if (isProjectOwner == true) {%><a id="share-button" class="project-banner-button">Share</a><% } %>
+                        <% if (isProjectOwner == true) {%><a id="share-button" class="project-banner-button">Share</a><% } %>&emsp;
+                        <a id="filters-toggle-button" class="project-banner-button">Show Filters</a>
                     </div>
                 </div>
-                <button class="" onclick="sortBugsLowHigh()">Sort Accending</button>
-                <button class="" onclick="sortBugsHighLow()">Sort Decending</button>
+                <div id="filters" style="padding-right: 2em;display: none; gap: 1em;">
+                    <div style="flex: 1;"></div>
+                    <button class="filter-button" onclick="sortBugsLowHigh()">Sort Accending</button>
+                    <button class="filter-button" onclick="sortBugsHighLow()">Sort Decending</button>
+                </div>
                 <div class="bug-grid">
                         <% bugs.forEach(bug => { %>
                             <div class="bug-card more-info-card" data-level="<%=bug.level%>" data-name="<%=bug.name%>" data-date="<%=bug.createdOn%>" data-author="<%=bug.createdBy%>">
@@ -151,6 +155,17 @@
                                 alert("There was a problem sharing the project with " + email + " :(");
                             }
                         });
+                    });
+
+                    $("#filters-toggle-button").on("click", () => {
+                        if ($("#filters-toggle-button").text() === "Show Filters"){
+                            $("#filters").show(100);
+                            $("#filters").css("display", "flex");
+                            $("#filters-toggle-button").text("Hide Filters");
+                        } else {
+                            $("#filters").hide(100);
+                            $("#filters-toggle-button").text("Show Filters");
+                        }
                     });
                 </script>
             <% } %>
